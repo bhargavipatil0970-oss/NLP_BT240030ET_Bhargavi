@@ -1,0 +1,5220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LOCORA — Discover the City Beyond the Usual</title>
+  <meta name="description" content="Discover authentic local experiences, heritage walks, regional culinary secrets, and crafts with LOCORA. Connect with independent hosts across Indian cities.">
+  <meta property="og:title" content="LOCORA — Discover the City Beyond the Usual">
+  <meta property="og:description" content="Personalized discovery of authentic local experiences. Direct visibility for local community makers.">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    /* ==========================================================
+       LOCORA — DESIGN SYSTEM & TOKENS
+       ========================================================== */
+    :root {
+      --color-primary: #1C3829;
+      --color-primary-light: #2A523D;
+      --color-primary-dark: #12241A;
+      --color-secondary: #C85A32;
+      --color-secondary-hover: #B24E29;
+      --color-accent: #E58E58;
+      --color-bg: #FBF9F5;
+      --color-surface: #FFFFFF;
+      --color-surface-sand: #F3EFEA;
+      --color-surface-sand-dark: #E8E2D8;
+      --color-text-main: #1C1E1D;
+      --color-text-muted: #5C625E;
+      --color-border: #E5DFD5;
+      --color-border-light: #F0EAE1;
+      --color-success: #2A7B4C;
+      --color-error: #BA3C2A;
+      --color-warning: #D9822B;
+
+      --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+
+      --shadow-sm: 0 2px 8px rgba(28, 56, 41, 0.04);
+      --shadow-md: 0 8px 24px rgba(28, 56, 41, 0.08);
+      --shadow-lg: 0 16px 40px rgba(28, 56, 41, 0.12);
+      --shadow-hover: 0 20px 48px rgba(28, 56, 41, 0.16);
+
+      --radius-xs: 4px;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 24px;
+      --radius-pill: 9999px;
+
+      --container-max: 1280px;
+      --header-height: 80px;
+      --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ==========================================================
+       RESET & BASE STYLES
+       ========================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+    }
+
+    body {
+      font-family: var(--font-body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: 1rem;
+      border: none;
+      outline: none;
+      background: none;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .section-padding {
+      padding-top: 96px;
+      padding-bottom: 96px;
+    }
+
+    .bg-ivory { background-color: var(--color-bg); }
+    .bg-warm-sand { background-color: var(--color-surface-sand); }
+    .hidden { display: none !important; }
+    .text-center { text-align: center; }
+    .text-muted { color: var(--color-text-muted); }
+    .text-white { color: #FFFFFF; }
+    .text-white-muted { color: rgba(255, 255, 255, 0.82); }
+
+    h1, h2, h3, h4, .serif-font {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--color-text-main);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-secondary);
+      margin-bottom: 12px;
+    }
+
+    .eyebrow-accent {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 3.5vw, 2.75rem);
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+    }
+
+    .section-lead {
+      font-size: 1.125rem;
+      color: var(--color-text-muted);
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-header.text-center .section-lead {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .section-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 48px;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================
+       BUTTONS & BADGES
+       ========================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(28, 56, 41, 0.25);
+    }
+
+    .btn-secondary {
+      background-color: var(--color-secondary);
+      color: #FFFFFF;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--color-secondary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(200, 90, 50, 0.25);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--color-primary);
+      border: 1.5px solid var(--color-border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--color-primary);
+      background-color: rgba(28, 56, 41, 0.04);
+    }
+
+    .btn-block { width: 100%; }
+    .btn-lg { padding: 16px 32px; font-size: 1.05rem; }
+
+    .btn-text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--color-secondary);
+      margin-top: 14px;
+      transition: gap var(--transition-fast);
+    }
+
+    .btn-text-link:hover {
+      gap: 10px;
+      color: var(--color-secondary-hover);
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-main);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      transition: all var(--transition-fast);
+    }
+
+    .icon-btn:hover {
+      background: var(--color-surface-sand);
+      transform: scale(1.05);
+    }
+
+    .badge-btn { position: relative; }
+    .badge-btn .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: var(--color-secondary);
+      color: #FFFFFF;
+      font-size: 0.7rem;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ==========================================================
+       SCROLL PROGRESS & ANNOUNCEMENT BAR
+       ========================================================== */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background-color: var(--color-secondary);
+      width: 0%;
+      z-index: 1100;
+      transition: width 0.1s linear;
+    }
+
+    .announcement-bar {
+      background-color: var(--color-primary-dark);
+      color: #FFFFFF;
+      font-size: 0.85rem;
+      padding: 8px 0;
+      position: relative;
+      z-index: 1001;
+    }
+
+    .announcement-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .announcement-close {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      padding: 0 4px;
+    }
+
+    /* ==========================================================
+       STICKY HEADER & NAVIGATION
+       ========================================================== */
+    .header {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--header-height);
+      background-color: rgba(251, 249, 245, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      border-bottom: 1px solid transparent;
+      transition: all var(--transition-smooth);
+    }
+
+    .header.scrolled {
+      background-color: rgba(255, 255, 255, 0.96);
+      border-bottom-color: var(--color-border);
+      box-shadow: var(--shadow-sm);
+      height: 70px;
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-serif);
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--color-primary);
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-link {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--color-text-main);
+      position: relative;
+      padding: 6px 0;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background-color: var(--color-secondary);
+      transition: width var(--transition-fast);
+    }
+
+    .nav-link:hover::after { width: 100%; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .city-selector-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      transition: all var(--transition-fast);
+    }
+
+    .city-selector-btn:hover { border-color: var(--color-primary); }
+    .city-selector-btn .chevron-icon {
+      width: 14px;
+      height: 14px;
+      transition: transform var(--transition-fast);
+    }
+
+    .city-selector-btn[aria-expanded="true"] .chevron-icon {
+      transform: rotate(180deg);
+    }
+
+    .city-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      width: 220px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 8px;
+      display: none;
+      flex-direction: column;
+      z-index: 1010;
+    }
+
+    .city-dropdown-menu.show { display: flex; }
+
+    .city-item-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      color: var(--color-text-main);
+      transition: background var(--transition-fast);
+    }
+
+    .city-item-btn:hover, .city-item-btn.active {
+      background-color: var(--color-surface-sand);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .hamburger-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      width: 32px;
+      height: 24px;
+      background: none;
+      padding: 0;
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: var(--color-primary);
+      border-radius: 2px;
+      transition: all var(--transition-fast);
+    }
+
+    /* ==========================================================
+       MOBILE DRAWER
+       ========================================================== */
+    .mobile-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(18, 36, 26, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 1200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-smooth);
+    }
+
+    .mobile-drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 85%;
+      max-width: 380px;
+      height: 100%;
+      background: var(--color-surface);
+      z-index: 1201;
+      transform: translateX(100%);
+      transition: transform var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+    }
+
+    .mobile-drawer.active { transform: translateX(0); }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .drawer-close {
+      font-size: 1.4rem;
+      color: var(--color-text-muted);
+    }
+
+    .mobile-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px 0;
+      flex-grow: 1;
+    }
+
+    .mobile-nav-link {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    .drawer-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* ==========================================================
+       HERO SECTION
+       ========================================================== */
+    .hero-section {
+      position: relative;
+      min-height: calc(90vh - var(--header-height));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-top: 64px;
+      overflow: hidden;
+    }
+
+    .hero-background-wrapper {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .hero-bg-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.03);
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(251, 249, 245, 0.95) 0%,
+        rgba(251, 249, 245, 0.88) 40%,
+        rgba(251, 249, 245, 0.98) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      margin-top: auto;
+      margin-bottom: auto;
+      padding-top: 32px;
+      padding-bottom: 48px;
+    }
+
+    .hero-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(28, 56, 41, 0.08);
+      border: 1px solid rgba(28, 56, 41, 0.14);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--color-primary);
+      margin-bottom: 24px;
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--color-secondary);
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 5.5vw, 4.25rem);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      max-width: 820px;
+      margin-bottom: 20px;
+    }
+
+    .highlight-serif {
+      font-style: italic;
+      font-family: var(--font-serif);
+      color: var(--color-secondary);
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      line-height: 1.6;
+      color: var(--color-text-muted);
+      max-width: 680px;
+      margin-bottom: 40px;
+    }
+
+    .hero-search-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      max-width: 960px;
+      backdrop-filter: blur(16px);
+    }
+
+    .search-field {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 4px;
+    }
+
+    .search-field label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+    }
+
+    .search-field label i {
+      width: 14px;
+      height: 14px;
+      color: var(--color-secondary);
+    }
+
+    .search-field input, .search-field select {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      background: transparent;
+    }
+
+    .search-divider {
+      width: 1px;
+      height: 36px;
+      background-color: var(--color-border);
+    }
+
+    .hero-search-btn {
+      padding: 14px 28px;
+      white-space: nowrap;
+    }
+
+    .hero-floating-badges {
+      position: absolute;
+      top: 10%;
+      right: 4%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      pointer-events: none;
+    }
+
+    .floating-chip {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--color-border-light);
+      box-shadow: var(--shadow-md);
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .floating-chip strong {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--color-primary);
+    }
+
+    .floating-chip span {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .chip-star { color: #E5A832; fill: #E5A832; }
+    .chip-shield { color: var(--color-primary); }
+
+    .hero-moods-bar {
+      position: relative;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--color-border);
+      padding: 16px 0;
+    }
+
+    .mood-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .mood-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    .mood-chips-scroll {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 2px;
+    }
+
+    .mood-chips-scroll::-webkit-scrollbar { display: none; }
+
+    .mood-chip {
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+
+    .mood-chip:hover {
+      background: var(--color-surface-sand);
+      border-color: var(--color-primary);
+    }
+
+    .mood-chip.active {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+      border-color: var(--color-primary);
+    }
+
+    /* ==========================================================
+       PROBLEM-SOLUTION COMPARISON SECTION
+       ========================================================== */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+
+    .comparison-card {
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      position: relative;
+      border: 1px solid var(--color-border);
+    }
+
+    .comparison-card.traditional { background-color: #F7F5F2; }
+    .comparison-card.locora {
+      background-color: #FFFFFF;
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .comparison-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      background: #E8E2D8;
+      color: var(--color-text-muted);
+      margin-bottom: 16px;
+    }
+
+    .comparison-badge.active-badge {
+      background: var(--color-primary);
+      color: #FFFFFF;
+    }
+
+    .comparison-card h3 { font-size: 1.65rem; margin-bottom: 24px; }
+    .comparison-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .comparison-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.96rem;
+      color: var(--color-text-main);
+    }
+
+    .comparison-list li i {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .comparison-card.traditional li i { color: #BA3C2A; }
+    .comparison-card.locora li i { color: var(--color-success); }
+
+    .trip-toggle-container {
+      background: var(--color-surface-sand);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      border: 1px solid var(--color-border);
+    }
+
+    .toggle-control-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .toggle-control-box span {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--color-primary);
+    }
+
+    .btn-group-toggle {
+      display: flex;
+      background: #FFFFFF;
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--color-border);
+    }
+
+    .trip-toggle-btn {
+      padding: 8px 20px;
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      transition: all var(--transition-fast);
+    }
+
+    .trip-toggle-btn.active {
+      background: var(--color-secondary);
+      color: #FFFFFF;
+    }
+
+    .trip-scenario-box {
+      background: #FFFFFF;
+      padding: 24px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+    }
+
+    /* ==========================================================
+       EXPERIENCE CARDS & FILTER TOOLBAR
+       ========================================================== */
+    .filter-toolbar {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-group label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+
+    .filter-select {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      background: var(--color-surface-sand);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .reset-filters-btn {
+      margin-left: auto;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+    }
+
+    .experience-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .experience-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+      position: relative;
+    }
+
+    .experience-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-image-wrap {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background-color: var(--color-surface-sand);
+    }
+
+    .card-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .experience-card:hover .card-image-wrap img {
+      transform: scale(1.06);
+    }
+
+    .card-category-pill {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(28, 56, 41, 0.9);
+      backdrop-filter: blur(4px);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    .card-fav-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-main);
+      transition: transform var(--transition-fast), color var(--transition-fast);
+    }
+
+    .card-fav-btn:hover { transform: scale(1.15); }
+    .card-fav-btn.active { color: #E53935; }
+    .card-fav-btn.active svg { fill: #E53935; }
+
+    .card-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .card-meta-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      margin-bottom: 10px;
+    }
+
+    .card-location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+    }
+
+    .card-location i { width: 14px; height: 14px; color: var(--color-secondary); }
+
+    .card-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    .card-rating i { width: 14px; height: 14px; fill: #E5A832; color: #E5A832; }
+
+    .card-title {
+      font-size: 1.35rem;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      color: var(--color-text-main);
+    }
+
+    .card-host-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 18px;
+    }
+
+    .host-avatar-micro {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .card-footer-pricing {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-price-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-price-num {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .card-price-unit {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 64px 24px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .empty-icon-wrap {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--color-surface-sand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: var(--color-secondary);
+    }
+
+    .empty-state h3 { font-size: 1.5rem; margin-bottom: 12px; }
+    .empty-state p { color: var(--color-text-muted); margin-bottom: 24px; }
+
+    /* ==========================================================
+       CURIOSITY & PERSONALIZED RECOMMENDATIONS
+       ========================================================== */
+    .curiosity-section { background: #FDFBF8; }
+
+    .editorial-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .preference-picker {
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-top: 32px;
+    }
+
+    .picker-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-bottom: 16px;
+    }
+
+    .preference-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .pref-tag {
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 600;
+      background: var(--color-surface-sand);
+      color: var(--color-text-main);
+      border: 1px solid var(--color-border);
+      transition: all var(--transition-fast);
+    }
+
+    .pref-tag:hover { background: #E8E2D8; }
+
+    .pref-tag.selected {
+      background: var(--color-primary);
+      color: #FFFFFF;
+      border-color: var(--color-primary);
+    }
+
+    .profile-status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-secondary);
+      padding: 12px 16px;
+      background: #FAF3EF;
+      border-radius: var(--radius-md);
+    }
+
+    .quiz-cta-box {
+      margin-top: 32px;
+      padding: 24px;
+      background: var(--color-surface-sand);
+      border-radius: var(--radius-md);
+    }
+
+    .quiz-cta-box h4 { font-size: 1.15rem; margin-bottom: 6px; }
+    .quiz-cta-box p { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 16px; }
+
+    .curiosity-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .badge-subtle {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--color-surface-sand);
+      color: var(--color-primary);
+    }
+
+    .personalized-cards-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .rec-card-mini {
+      display: flex;
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition-fast);
+    }
+
+    .rec-card-mini:hover { transform: translateX(4px); }
+
+    .rec-card-mini img {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .rec-mini-content {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex-grow: 1;
+    }
+
+    .rec-match-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-secondary);
+      margin-bottom: 4px;
+    }
+
+    .rec-mini-content h4 { font-size: 1.1rem; margin-bottom: 6px; }
+
+    /* ==========================================================
+       HIDDEN GEMS ASYMMETRIC SECTION
+       ========================================================== */
+    .asymmetric-gems-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 32px;
+    }
+
+    .gem-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gem-card.large-gem { grid-row: span 2; }
+    .gem-img-wrap {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+    }
+
+    .gem-card.large-gem .gem-img-wrap { aspect-ratio: 16 / 11; }
+    .gem-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gem-location-badge {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      background: rgba(28, 56, 41, 0.85);
+      backdrop-filter: blur(6px);
+      color: #FFFFFF;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gem-content {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .gem-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--color-secondary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .gem-content h3 { font-size: 1.5rem; margin-bottom: 12px; }
+    .gem-content p {
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    /* ==========================================================
+       MAP DISCOVERY SECTION
+       ========================================================== */
+    .map-split-container {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 24px;
+      height: 580px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-md);
+      background: #FFFFFF;
+    }
+
+    .map-view-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .leaflet-map-canvas {
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
+
+    .map-fallback-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--color-surface-sand);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 11;
+      color: var(--color-text-muted);
+    }
+
+    .map-sidebar {
+      display: flex;
+      flex-direction: column;
+      background: #FFFFFF;
+      border-left: 1px solid var(--color-border);
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .map-filter-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .map-tag-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--color-surface-sand);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-main);
+      transition: all var(--transition-fast);
+    }
+
+    .map-tag-btn.active {
+      background: var(--color-primary);
+      color: #FFFFFF;
+      border-color: var(--color-primary);
+    }
+
+    .map-places-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .map-place-item {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--color-surface-sand);
+      border: 1px solid var(--color-border-light);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .map-place-item:hover, .map-place-item.active {
+      background: #FFFFFF;
+      border-color: var(--color-secondary);
+      box-shadow: var(--shadow-sm);
+      transform: translateX(3px);
+    }
+
+    .map-place-item h5 { font-size: 0.95rem; margin-bottom: 4px; }
+    .map-place-item p { font-size: 0.8rem; color: var(--color-text-muted); }
+
+    /* ==========================================================
+       LOCAL HOSTS SECTION
+       ========================================================== */
+    .hosts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+    }
+
+    .host-card {
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+      padding: 32px 24px;
+      transition: all var(--transition-smooth);
+    }
+
+    .host-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .host-avatar-wrap {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 18px;
+      border: 3px solid var(--color-surface-sand-dark);
+    }
+
+    .host-avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .host-card h4 { font-size: 1.25rem; margin-bottom: 4px; }
+    .host-role-tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-secondary);
+      margin-bottom: 12px;
+    }
+
+    .host-bio-snippet {
+      font-size: 0.88rem;
+      color: var(--color-text-muted);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .host-stats-pill {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      padding: 8px 12px;
+      background: var(--color-surface-sand);
+      border-radius: var(--radius-pill);
+      margin-bottom: 20px;
+    }
+
+    /* ==========================================================
+       FOOD & CRAFT SHOWCASE GRIDS
+       ========================================================== */
+    .food-tabs { display: flex; gap: 8px; }
+
+    .food-tab-btn {
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-main);
+      transition: all var(--transition-fast);
+    }
+
+    .food-tab-btn.active {
+      background: var(--color-secondary);
+      color: #FFFFFF;
+      border-color: var(--color-secondary);
+    }
+
+    .food-showcase-grid, .culture-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    /* ==========================================================
+       EDITORIAL DIGITAL MAGAZINE CARD
+       ========================================================== */
+    .editorial-feature-card {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-md);
+    }
+
+    .feature-image-col { position: relative; }
+    .feature-image-col img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-credit {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-xs);
+    }
+
+    .feature-text-col {
+      padding: 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .magazine-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--color-secondary);
+      margin-bottom: 16px;
+    }
+
+    .magazine-headline {
+      font-size: clamp(1.8rem, 2.5vw, 2.3rem);
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+
+    .magazine-excerpt {
+      font-size: 1rem;
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .magazine-author {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .author-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* ==========================================================
+       COMMUNITY CALENDAR / EVENTS SECTION
+       ========================================================== */
+    .event-filter-pills { display: flex; gap: 8px; }
+
+    .time-filter-btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-main);
+      transition: all var(--transition-fast);
+    }
+
+    .time-filter-btn.active {
+      background: var(--color-primary);
+      color: #FFFFFF;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .event-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition-fast);
+    }
+
+    .event-card:hover { transform: translateY(-4px); }
+
+    .event-date-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .event-date-pill {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: #F4ECE6;
+      color: var(--color-secondary);
+    }
+
+    .event-card h4 { font-size: 1.25rem; margin-bottom: 8px; }
+    .event-meta {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    /* ==========================================================
+       IMPACT METRICS SECTION
+       ========================================================== */
+    .impact-section {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+      position: relative;
+    }
+
+    .badge-demo {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+      margin-top: 12px;
+    }
+
+    .stats-counter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      margin-top: 56px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-lg);
+      padding: 36px 24px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: var(--font-serif);
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .stat-suffix {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      color: var(--color-accent);
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-top: 8px;
+      margin-bottom: 10px;
+      color: #FFFFFF;
+    }
+
+    .stat-desc {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+    }
+
+    /* ==========================================================
+       HOW IT WORKS (3 STEPS)
+       ========================================================== */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 36px;
+      position: relative;
+    }
+
+    .step-card {
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-number {
+      font-family: var(--font-serif);
+      font-size: 2.75rem;
+      font-weight: 700;
+      color: var(--color-surface-sand-dark);
+      position: absolute;
+      top: 24px;
+      right: 28px;
+    }
+
+    .step-icon-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--color-surface-sand);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .step-card h3 { font-size: 1.35rem; margin-bottom: 12px; }
+    .step-card p { font-size: 0.95rem; color: var(--color-text-muted); line-height: 1.6; }
+
+    /* ==========================================================
+       PROVIDER CTA BANNER
+       ========================================================== */
+    .provider-banner-card {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      background: #FAF6F0;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .provider-content-col {
+      padding: 64px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .provider-benefits {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 28px 0 36px;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .benefit-item i { color: var(--color-secondary); }
+    .provider-actions { display: flex; gap: 16px; }
+    .provider-image-col img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ==========================================================
+       TESTIMONIALS SLIDER
+       ========================================================== */
+    .slider-nav-controls { display: flex; gap: 12px; }
+
+    .slider-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-main);
+      transition: all var(--transition-fast);
+    }
+
+    .slider-btn:hover {
+      background: var(--color-primary);
+      color: #FFFFFF;
+    }
+
+    .testimonial-slider-viewport {
+      overflow: hidden;
+      position: relative;
+      border-radius: var(--radius-lg);
+    }
+
+    .testimonial-track {
+      position: relative;
+      min-height: 240px;
+    }
+
+    .testimonial-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 48px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .testimonial-slide.active {
+      position: relative;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .testimonial-quote-mark {
+      font-family: var(--font-serif);
+      font-size: 4rem;
+      line-height: 1;
+      color: var(--color-accent);
+      margin-bottom: 8px;
+    }
+
+    .testimonial-quote {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      line-height: 1.6;
+      color: var(--color-text-main);
+      margin-bottom: 28px;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .author-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* ==========================================================
+       NEWSLETTER
+       ========================================================== */
+    .newsletter-card {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .input-with-button {
+      display: flex;
+      background: #FFFFFF;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      padding: 6px;
+      margin: 28px 0 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .input-with-button input {
+      flex: 1;
+      padding: 12px 20px;
+      color: var(--color-text-main);
+    }
+
+    .form-micro-text {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+    }
+
+    .form-message {
+      margin-top: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .form-message.success { color: var(--color-success); }
+    .form-message.error { color: var(--color-error); }
+
+    /* ==========================================================
+       FOOTER
+       ========================================================== */
+    .site-footer {
+      background: #141A17;
+      color: #FFFFFF;
+      padding-top: 80px;
+      padding-bottom: 40px;
+    }
+
+    .footer-top-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 64px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-logo {
+      color: #FFFFFF;
+      margin-bottom: 18px;
+    }
+
+    .footer-tagline {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--color-accent);
+      margin-bottom: 12px;
+    }
+
+    .footer-mission {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.6;
+      max-width: 320px;
+    }
+
+    .footer-col-heading {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #FFFFFF;
+      margin-bottom: 20px;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-links a {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .footer-links a:hover {
+      color: #FFFFFF;
+      padding-left: 4px;
+    }
+
+    .footer-bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 32px;
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.5);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-social-links { display: flex; gap: 16px; }
+    .social-icon {
+      color: rgba(255, 255, 255, 0.7);
+      transition: color var(--transition-fast);
+    }
+
+    .social-icon:hover { color: #FFFFFF; }
+
+    /* ==========================================================
+       MODAL ARCHITECTURE
+       ========================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(18, 36, 26, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-smooth);
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-dialog {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-hover);
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      transform: translateY(20px) scale(0.98);
+      transition: transform var(--transition-smooth);
+    }
+
+    .modal-backdrop.open .modal-dialog {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--color-surface-sand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--color-text-muted);
+    }
+
+    .modal-close-floating {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 20;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .search-modal-dialog {
+      width: 100%;
+      max-width: 720px;
+      padding: 24px;
+    }
+
+    .search-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .search-input-wrapper input {
+      font-size: 1.25rem;
+      font-weight: 500;
+      width: 100%;
+    }
+
+    .quick-tags-section { padding: 16px 0; }
+    .quick-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    .quick-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .search-shortcut-pill {
+      padding: 6px 14px;
+      background: var(--color-surface-sand);
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .search-live-results {
+      max-height: 380px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 12px;
+    }
+
+    .exp-modal-dialog {
+      width: 100%;
+      max-width: 960px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .exp-hero-gallery {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 8px;
+      height: 380px;
+    }
+
+    .exp-hero-gallery img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .exp-modal-inner { padding: 40px; }
+    .exp-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .exp-main-col {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 48px;
+    }
+
+    .exp-detail-block { margin-bottom: 32px; }
+    .exp-detail-block h4 { font-size: 1.2rem; margin-bottom: 12px; }
+
+    .exp-included-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .exp-included-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+    }
+
+    .exp-booking-sticky-card {
+      background: var(--color-surface-sand);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      border: 1px solid var(--color-border);
+      height: fit-content;
+    }
+
+    .booking-modal-dialog {
+      width: 100%;
+      max-width: 520px;
+      padding: 32px;
+    }
+
+    .booking-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .booking-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--color-secondary);
+    }
+
+    .booking-summary-pill {
+      background: var(--color-surface-sand);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .form-control label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-control input, .form-control select, .form-control textarea {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      background: #FFFFFF;
+    }
+
+    .guest-stepper {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .stepper-btn {
+      width: 44px;
+      height: 44px;
+      background: var(--color-surface-sand);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .guest-stepper input {
+      text-align: center;
+      border: none;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .price-breakdown-card {
+      background: var(--color-surface-sand);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin: 20px 0;
+    }
+
+    .price-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      margin-bottom: 8px;
+    }
+
+    .price-divider {
+      height: 1px;
+      background: var(--color-border);
+      margin: 12px 0;
+    }
+
+    .total-line {
+      font-size: 1.1rem;
+      color: var(--color-primary);
+    }
+
+    .booking-guarantee-note {
+      display: flex;
+      gap: 10px;
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-bottom: 20px;
+    }
+
+    .booking-guarantee-note i {
+      color: var(--color-success);
+      flex-shrink: 0;
+    }
+
+    .booking-success-view {
+      text-align: center;
+      padding: 24px 0;
+    }
+
+    .success-icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #E8F5E9;
+      color: var(--color-success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .receipt-box {
+      background: var(--color-surface-sand);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin: 24px 0;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    .favorites-dialog, .auth-dialog, .host-modal-dialog, .host-bio-dialog, .story-modal-dialog, .quiz-dialog {
+      width: 100%;
+      max-width: 540px;
+      padding: 32px;
+    }
+
+    .host-modal-dialog { max-width: 680px; }
+    .story-modal-dialog { max-width: 800px; padding: 0; }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 24px;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      padding: 12px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      border-bottom: 2px solid transparent;
+    }
+
+    .auth-tab-btn.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+
+    .auth-social-divider {
+      text-align: center;
+      position: relative;
+      margin: 24px 0;
+    }
+
+    .auth-social-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    .auth-social-divider span {
+      background: #FFFFFF;
+      position: relative;
+      padding: 0 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+
+    .social-auth-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-social {
+      padding: 10px;
+      font-size: 0.88rem;
+    }
+
+    .profile-header-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .profile-avatar-large {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #FFFFFF;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .profile-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      background: var(--color-surface-sand);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .p-stat strong { display: block; font-size: 1.25rem; color: var(--color-primary); }
+    .p-stat span { font-size: 0.75rem; color: var(--color-text-muted); }
+
+    .trip-micro-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+
+    .badge-confirmed {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: #E8F5E9;
+      color: var(--color-success);
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* ==========================================================
+       TOAST NOTIFICATION ENGINE
+       ========================================================== */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 2000;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      box-shadow: var(--shadow-lg);
+      border-left: 4px solid var(--color-primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+      max-width: 400px;
+      pointer-events: auto;
+      transform: translateX(120%);
+      transition: transform var(--transition-smooth);
+    }
+
+    .toast.visible { transform: translateX(0); }
+    .toast.info { border-left-color: var(--color-primary); }
+    .toast.success { border-left-color: var(--color-success); }
+    .toast.warning { border-left-color: var(--color-warning); }
+
+    /* ==========================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================== */
+    @media (max-width: 1024px) {
+      .experience-grid, .food-showcase-grid, .culture-grid, .events-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .hosts-grid { grid-template-columns: repeat(2, 1fr); }
+      .editorial-grid { grid-template-columns: 1fr; }
+      .map-split-container {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .leaflet-map-canvas { height: 380px; }
+      .editorial-feature-card { grid-template-columns: 1fr; }
+      .provider-banner-card { grid-template-columns: 1fr; }
+      .footer-top-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .desktop-nav, .hero-floating-badges, .host-cta-btn { display: none; }
+      .hamburger-btn { display: flex; }
+      .hero-search-box {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .search-divider { display: none; }
+      .hero-search-btn { width: 100%; }
+      .comparison-grid, .asymmetric-gems-grid, .steps-grid, .stats-counter-grid {
+        grid-template-columns: 1fr;
+      }
+      .experience-grid, .food-showcase-grid, .culture-grid, .events-grid {
+        grid-template-columns: 1fr;
+      }
+      .hosts-grid { grid-template-columns: 1fr; }
+      .exp-main-col { grid-template-columns: 1fr; }
+      .exp-hero-gallery {
+        grid-template-columns: 1fr;
+        height: 240px;
+      }
+      .exp-hero-gallery img:nth-child(2) { display: none; }
+      .form-row-2 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .section-padding {
+        padding-top: 64px;
+        padding-bottom: 64px;
+      }
+      .hero-title { font-size: 2.2rem; }
+      .btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      .social-auth-buttons { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Scroll Progress Bar -->
+  <div id="scrollProgress" class="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Global Announcement Bar -->
+  <aside class="announcement-bar">
+    <div class="container announcement-inner">
+      <span>🌿 <strong>Local Impact Guarantee:</strong> 72% of every booking directly sustains local makers and heritage keepers.</span>
+      <button type="button" class="announcement-close" id="closeAnnouncement" aria-label="Dismiss banner">✕</button>
+    </div>
+  </aside>
+
+  <!-- Navigation -->
+  <header id="mainHeader" class="header">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo" aria-label="LOCORA Home">
+        <svg class="brand-icon" viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="16" cy="16" r="13" stroke="currentColor" stroke-opacity="0.3"/>
+          <path d="M16 6 C10.477 6 6 10.477 6 16 C6 22 16 27 16 27 C16 27 26 22 26 16 C26 10.477 21.523 6 16 6 Z"/>
+          <circle cx="16" cy="14" r="3" fill="currentColor"/>
+        </svg>
+        <span class="brand-name">LOCORA</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <a href="#exploreSection" class="nav-link">Explore</a>
+        <a href="#featuredSection" class="nav-link">Experiences</a>
+        <a href="#foodSection" class="nav-link">Food</a>
+        <a href="#cultureSection" class="nav-link">Culture & Craft</a>
+        <a href="#eventsSection" class="nav-link">Events</a>
+        <a href="#impactSection" class="nav-link">Impact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- City Selector Trigger -->
+        <button type="button" class="city-selector-btn" id="cityDropdownBtn" aria-expanded="false" aria-label="Select City">
+          <i data-lucide="map-pin"></i>
+          <span id="currentCityDisplay">Mumbai</span>
+          <i data-lucide="chevron-down" class="chevron-icon"></i>
+        </button>
+
+        <div class="city-dropdown-menu" id="cityDropdownMenu" role="menu"></div>
+
+        <button type="button" class="icon-btn" id="openSearchBtn" aria-label="Open search">
+          <i data-lucide="search"></i>
+        </button>
+        <button type="button" class="icon-btn badge-btn" id="openFavoritesBtn" aria-label="View saved items">
+          <i data-lucide="heart"></i>
+          <span class="badge" id="favCountBadge">0</span>
+        </button>
+        <button type="button" class="icon-btn" id="openAuthBtn" aria-label="Account">
+          <i data-lucide="user"></i>
+        </button>
+        <button type="button" class="btn btn-primary host-cta-btn" id="hostCtaNav">
+          Become a Host
+        </button>
+        <button type="button" class="hamburger-btn" id="mobileMenuToggle" aria-label="Toggle navigation menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-drawer-overlay" id="mobileDrawerOverlay"></div>
+  <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <span class="brand-name">LOCORA</span>
+      </div>
+      <button type="button" class="drawer-close" id="closeDrawerBtn" aria-label="Close menu">✕</button>
+    </div>
+    <div class="drawer-body">
+      <nav class="mobile-nav">
+        <a href="#exploreSection" class="mobile-nav-link">Explore Everything</a>
+        <a href="#featuredSection" class="mobile-nav-link">Featured Experiences</a>
+        <a href="#mapSection" class="mobile-nav-link">Neighborhood Map</a>
+        <a href="#hostsSection" class="mobile-nav-link">Meet Local Hosts</a>
+        <a href="#foodSection" class="mobile-nav-link">Eat the City</a>
+        <a href="#cultureSection" class="mobile-nav-link">Culture & Craft</a>
+        <a href="#eventsSection" class="mobile-nav-link">Local Happenings</a>
+        <a href="#impactSection" class="mobile-nav-link">Community Impact</a>
+      </nav>
+      <div class="drawer-footer">
+        <button type="button" class="btn btn-primary btn-block" id="hostCtaDrawer">Become a Host</button>
+        <button type="button" class="btn btn-outline btn-block" id="authCtaDrawer">Sign In or Register</button>
+      </div>
+    </div>
+  </aside>
+
+  <main id="mainContent">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-background-wrapper">
+        <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=1920&q=80" alt="Vibrant heritage street scene" class="hero-bg-img" id="heroBgImage">
+        <div class="hero-overlay"></div>
+      </div>
+
+      <div class="container hero-content">
+        <div class="hero-text-wrap">
+          <div class="hero-pill-badge">
+            <span class="pill-dot"></span>
+            <span>TRAVEL DIFFERENT</span>
+          </div>
+          <h1 class="hero-title" id="heroHeadline">
+            Discover the city <span class="highlight-serif">beyond</span> the usual.
+          </h1>
+          <p class="hero-subtitle" id="heroSubhead">
+            Step away from generic guidebooks. Connect with passionate home chefs, independent craftspeople, and neighborhood custodians across India.
+          </p>
+
+          <!-- Hero Discovery Search Component -->
+          <div class="hero-search-box">
+            <div class="search-field">
+              <label for="heroLocationInput"><i data-lucide="map-pin"></i> Where?</label>
+              <input type="text" id="heroLocationInput" placeholder="Choose a city (e.g. Mumbai)" readonly>
+            </div>
+            <div class="search-divider"></div>
+            <div class="search-field">
+              <label for="heroCuriosityInput"><i data-lucide="compass"></i> What are you curious about?</label>
+              <input type="text" id="heroCuriosityInput" placeholder="Food, pottery, indie art, spice walks...">
+            </div>
+            <div class="search-divider"></div>
+            <div class="search-field">
+              <label for="heroWhenSelect"><i data-lucide="calendar"></i> When?</label>
+              <select id="heroWhenSelect">
+                <option value="anytime">Anytime</option>
+                <option value="today">Today</option>
+                <option value="weekend">This Weekend</option>
+                <option value="month">This Month</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-primary hero-search-btn" id="heroSearchAction">
+              <i data-lucide="search"></i>
+              <span>Discover</span>
+            </button>
+          </div>
+
+          <!-- Hero Floating Trust Badges -->
+          <div class="hero-floating-badges" aria-hidden="true">
+            <div class="floating-chip chip-1">
+              <i data-lucide="star" class="chip-star"></i>
+              <div>
+                <strong>4.9 ★ Rating</strong>
+                <span>Over 18k travelers</span>
+              </div>
+            </div>
+            <div class="floating-chip chip-2">
+              <i data-lucide="shield-check" class="chip-shield"></i>
+              <div>
+                <strong>100% Vetted Hosts</strong>
+                <span>True community makers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mood Chips Ribbon -->
+      <div class="hero-moods-bar">
+        <div class="container mood-container">
+          <span class="mood-title">Start with your travel mood:</span>
+          <div class="mood-chips-scroll" id="moodChipsTrack">
+            <button type="button" class="mood-chip active" data-mood="all">✨ All Moods</button>
+            <button type="button" class="mood-chip" data-mood="food">🍜 Eat like a local</button>
+            <button type="button" class="mood-chip" data-mood="craft">🏺 Meet local makers</button>
+            <button type="button" class="mood-chip" data-mood="culture">🏛️ Find hidden gems</button>
+            <button type="button" class="mood-chip" data-mood="art">🎨 Indie art & spaces</button>
+            <button type="button" class="mood-chip" data-mood="slow">🌿 Slow down</button>
+            <button type="button" class="mood-chip" data-mood="nightlife">🌙 Night owls</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Traditional vs Locora Narrative Section -->
+    <section class="problem-solution-section section-padding">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="eyebrow">A SHIFT IN PERSPECTIVE</span>
+          <h2 class="section-title">Travel has changed. Discovery should too.</h2>
+          <p class="section-lead">The modern traveler wants human connection, authentic food, and living culture—not tourist traps and sterile tour buses.</p>
+        </div>
+
+        <div class="comparison-grid">
+          <div class="comparison-card traditional">
+            <div class="comparison-badge">THE OLD WAY</div>
+            <h3>The Tourist Checklist</h3>
+            <ul class="comparison-list">
+              <li><i data-lucide="x"></i> The same generic Top 10 attractions everyone visits</li>
+              <li><i data-lucide="x"></i> Overpriced, sanitized restaurants on main thoroughfares</li>
+              <li><i data-lucide="x"></i> Megastore souvenir outlets with mass-produced trinkets</li>
+              <li><i data-lucide="x"></i> Tour buses isolating travelers behind tinted glass</li>
+              <li><i data-lucide="x"></i> Tourism profits leak away to overseas corporations</li>
+            </ul>
+          </div>
+
+          <div class="comparison-card locora">
+            <div class="comparison-badge active-badge">THE LOCORA WAY</div>
+            <h3>Deep Local Belonging</h3>
+            <ul class="comparison-list">
+              <li><i data-lucide="check"></i> Secret alleys, rooftop studios, and private heritage homes</li>
+              <li><i data-lucide="check"></i> Family recipes and street food stalls known only to locals</li>
+              <li><i data-lucide="check"></i> Handcrafted art made alongside independent masters</li>
+              <li><i data-lucide="check"></i> Intimate walking conversations with lifelong historians</li>
+              <li><i data-lucide="check"></i> Direct economic sustainability for neighborhood creators</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Interactive Trip Comparison Toggle -->
+        <div class="trip-toggle-container">
+          <div class="toggle-control-box">
+            <span>Compare an afternoon:</span>
+            <div class="btn-group-toggle" role="radiogroup" aria-label="Trip style toggle">
+              <button type="button" class="trip-toggle-btn active" id="toggleTypical" aria-checked="true">Typical Tourist Trip</button>
+              <button type="button" class="trip-toggle-btn" id="toggleLocal" aria-checked="false">LOCORA Local Immersion</button>
+            </div>
+          </div>
+          <div class="trip-scenario-box" id="tripScenarioContent"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Dynamic Discovery / Explore View -->
+    <section class="section-padding bg-ivory" id="exploreSection">
+      <div class="container">
+        <div class="section-header-flex">
+          <div>
+            <span class="eyebrow">CURATED EXPERIENCES</span>
+            <h2 class="section-title">Experiences worth leaving the map for.</h2>
+            <p class="section-lead">Not tourist traps. Just good stories, warm people, and places worth remembering.</p>
+          </div>
+          <div class="results-stats">
+            <span id="resultsCountLabel">Showing all experiences</span>
+          </div>
+        </div>
+
+        <!-- Multi-Filter Tool Bar -->
+        <div class="filter-toolbar">
+          <div class="filter-group">
+            <label for="filterCategorySelect">Category</label>
+            <select id="filterCategorySelect" class="filter-select">
+              <option value="all">All Categories</option>
+              <option value="food">Food & Drink</option>
+              <option value="culture">Culture & History</option>
+              <option value="craft">Craft & Making</option>
+              <option value="art">Art & Studio</option>
+              <option value="nature">Nature & Slow</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterPriceSelect">Max Price</label>
+            <select id="filterPriceSelect" class="filter-select">
+              <option value="all">Any Price</option>
+              <option value="800">Under ₹800</option>
+              <option value="1200">Under ₹1,200</option>
+              <option value="1500">Under ₹1,500</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterDurationSelect">Duration</label>
+            <select id="filterDurationSelect" class="filter-select">
+              <option value="all">Any Duration</option>
+              <option value="short">Under 2 hours</option>
+              <option value="half">2 to 4 hours</option>
+              <option value="full">Full day (4+ hrs)</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterRatingSelect">Rating</label>
+            <select id="filterRatingSelect" class="filter-select">
+              <option value="all">Any Rating</option>
+              <option value="4.8">4.8+ Stars</option>
+              <option value="4.9">4.9+ Stars</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="sortSelect">Sort By</label>
+            <select id="sortSelect" class="filter-select">
+              <option value="recommended">Recommended</option>
+              <option value="rating">Top Rated</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn-outline reset-filters-btn" id="resetFiltersBtn">
+            <i data-lucide="rotate-ccw"></i> Reset
+          </button>
+        </div>
+
+        <!-- Experience Cards Grid -->
+        <div class="experience-grid" id="experienceGrid"></div>
+
+        <!-- Empty State Container -->
+        <div class="empty-state hidden" id="experienceEmptyState">
+          <div class="empty-icon-wrap">
+            <i data-lucide="compass"></i>
+          </div>
+          <h3>Nothing found yet.</h3>
+          <p>We couldn't find any experiences matching your exact filters. Try broadening your criteria or reset the search.</p>
+          <button type="button" class="btn btn-primary" id="clearSearchFromEmpty">Explore Everything</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Personalized Recommendation Engine & Curiosity Quiz -->
+    <section class="section-padding curiosity-section" id="curiositySection">
+      <div class="container">
+        <div class="editorial-grid">
+          <div class="curiosity-intro">
+            <span class="eyebrow">TAILORED FOR YOU</span>
+            <h2 class="section-title">Made for your kind of curious.</h2>
+            <p class="section-lead">Tell us what fuels your wonder. We’ll build a customized discovery profile that pairs you with matching hosts and neighborhood artisans.</p>
+
+            <div class="preference-picker">
+              <span class="picker-label">Tap what you naturally gravitate toward:</span>
+              <div class="preference-tags" id="preferenceTagsContainer">
+                <button type="button" class="pref-tag" data-pref="food">Street Delicacies</button>
+                <button type="button" class="pref-tag" data-pref="history">Hidden Architecture</button>
+                <button type="button" class="pref-tag" data-pref="craft">Handmade Textiles</button>
+                <button type="button" class="pref-tag" data-pref="art">Contemporary Art</button>
+                <button type="button" class="pref-tag" data-pref="slow">Slow Tea Houses</button>
+                <button type="button" class="pref-tag" data-pref="music">Local Folk Rhythms</button>
+                <button type="button" class="pref-tag" data-pref="nature">Botanical Walks</button>
+              </div>
+              <div class="profile-status-bar" id="profileStatusBar">
+                <i data-lucide="sparkles"></i>
+                <span id="profileStatusText">Select at least 2 interests to unlock tailored recommendations.</span>
+              </div>
+            </div>
+
+            <!-- Mini Quiz Trigger -->
+            <div class="quiz-cta-box">
+              <h4>Unsure where to begin?</h4>
+              <p>Take our 60-second Traveler Personality Quiz.</p>
+              <button type="button" class="btn btn-secondary" id="launchQuizBtn">Start 60-Sec Quiz</button>
+            </div>
+          </div>
+
+          <div class="curiosity-output">
+            <div class="curiosity-header">
+              <h3 id="curiosityMatchesTitle">Curated Recommendations</h3>
+              <span class="badge-subtle" id="matchBadgeCount">Matching your vibe</span>
+            </div>
+            <div class="personalized-cards-wrap" id="personalizedList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Editorial Hidden Gems Section -->
+    <section class="section-padding bg-warm-sand" id="gemsSection">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">OFF THE BEATEN PATH</span>
+          <h2 class="section-title">Some of the best places don't have billboards.</h2>
+          <p class="section-lead">Stories, tucked-away courtyards, and generational workshops that travel algorithms consistently overlook.</p>
+        </div>
+
+        <div class="asymmetric-gems-grid" id="gemsGrid">
+          <article class="gem-card large-gem">
+            <div class="gem-img-wrap">
+              <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80" alt="Old Irani Cafe Interior" loading="lazy">
+              <span class="gem-location-badge"><i data-lucide="map-pin"></i> Mumbai — Fort District</span>
+            </div>
+            <div class="gem-content">
+              <span class="gem-tag">CENTURY-OLD SANCTUARY</span>
+              <h3>The Whispering Chai Counter of Fort</h3>
+              <p>Behind an unmarked wooden swinging door lies a 94-year-old Zoroastrian bakery where the sourdough bun maska recipe hasn't changed since 1932. No Wi-Fi, no loud playlists—just antique mirrors and the ticking of a grandfather clock.</p>
+              <button type="button" class="btn-text-link" onclick="app.openStoryModal(1)">
+                Read Full Story <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </article>
+
+          <article class="gem-card">
+            <div class="gem-img-wrap">
+              <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80" alt="Clay pottery workshop" loading="lazy">
+              <span class="gem-location-badge"><i data-lucide="map-pin"></i> Pune — Kasba Peth</span>
+            </div>
+            <div class="gem-content">
+              <span class="gem-tag">POTTERY MEWS</span>
+              <h3>The 4th Generation Terracotta Mews</h3>
+              <p>Tucked deep into an alleyway where three generations still fire red clay vessels using reclaimed rainwater and kiln wood.</p>
+              <button type="button" class="btn-text-link" onclick="app.openStoryModal(2)">
+                Read Full Story <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </article>
+
+          <article class="gem-card">
+            <div class="gem-img-wrap">
+              <img src="https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=800&q=80" alt="Spice market" loading="lazy">
+              <span class="gem-location-badge"><i data-lucide="map-pin"></i> Delhi — Khari Baoli</span>
+            </div>
+            <div class="gem-content">
+              <span class="gem-tag">SPICE ALCHEMY</span>
+              <h3>The Secret Rooftop over the Spice Exchange</h3>
+              <p>Ascend 70 narrow stone steps through bags of cardamom and wild turmeric to find an open sky terrace where chai is brewed with heirloom saffron.</p>
+              <button type="button" class="btn-text-link" onclick="app.openStoryModal(3)">
+                Read Full Story <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Map Discovery Section -->
+    <section class="section-padding bg-ivory" id="mapSection">
+      <div class="container">
+        <div class="section-header-flex">
+          <div>
+            <span class="eyebrow">GEOGRAPHIC EXPLORATION</span>
+            <h2 class="section-title">See what's happening around you.</h2>
+            <p class="section-lead">Explore neighborhood clusters. Zoom into active craft studios, clandestine tasting kitchens, and cultural walks.</p>
+          </div>
+          <div class="map-city-pill" id="mapCurrentCityBadge">
+            <i data-lucide="compass"></i> Centered on Mumbai
+          </div>
+        </div>
+
+        <div class="map-split-container">
+          <div class="map-view-wrapper">
+            <div id="interactiveMap" class="leaflet-map-canvas" role="region" aria-label="Interactive city experience map"></div>
+            <div class="map-fallback-overlay hidden" id="mapFallback">
+              <i data-lucide="map"></i>
+              <p>Interactive Map Offline. Displaying static neighborhood index.</p>
+            </div>
+          </div>
+
+          <div class="map-sidebar">
+            <div class="map-filter-tags">
+              <button type="button" class="map-tag-btn active" data-map-cat="all">All</button>
+              <button type="button" class="map-tag-btn" data-map-cat="food">Food</button>
+              <button type="button" class="map-tag-btn" data-map-cat="craft">Crafts</button>
+              <button type="button" class="map-tag-btn" data-map-cat="culture">Culture</button>
+            </div>
+            <div class="map-places-list" id="mapPlacesList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meet Local Hosts Section -->
+    <section class="section-padding" id="hostsSection">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="eyebrow">THE LIVING PULSE</span>
+          <h2 class="section-title">Meet the people behind the places.</h2>
+          <p class="section-lead">LOCORA is not an inventory of coordinates. It’s an ensemble of passionate storytellers, master weavers, spice alchemists, and neighborhood custodians.</p>
+        </div>
+
+        <div class="hosts-grid" id="hostsGrid"></div>
+      </div>
+    </section>
+
+    <!-- Dedicated Food Experiences Section -->
+    <section class="section-padding bg-warm-sand" id="foodSection">
+      <div class="container">
+        <div class="section-header-flex">
+          <div>
+            <span class="eyebrow">CULINARY MEMORY</span>
+            <h2 class="section-title">Eat the city.</h2>
+            <p class="section-lead">Because the fastest way to understand a neighborhood's soul is through the kitchen table.</p>
+          </div>
+          <div class="food-tabs" id="foodCategoryFilter">
+            <button type="button" class="food-tab-btn active" data-food-tag="all">All Flavors</button>
+            <button type="button" class="food-tab-btn" data-food-tag="street">Street Stalls</button>
+            <button type="button" class="food-tab-btn" data-food-tag="home">Home Kitchens</button>
+            <button type="button" class="food-tab-btn" data-food-tag="walk">Market Walks</button>
+          </div>
+        </div>
+
+        <div class="food-showcase-grid" id="foodShowcaseGrid"></div>
+      </div>
+    </section>
+
+    <!-- Culture & Craft Section -->
+    <section class="section-padding" id="cultureSection">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">PRESERVE & PARTICIPATE</span>
+          <h2 class="section-title">Make something. Learn something. Take a story home.</h2>
+          <p class="section-lead">Step into family run studios. Learn generational traditions directly from the masters keeping living arts alive.</p>
+        </div>
+
+        <div class="culture-grid" id="cultureGrid"></div>
+      </div>
+    </section>
+
+    <!-- Editorial Digital Magazine Feature -->
+    <section class="section-padding bg-ivory" id="storiesSection">
+      <div class="container">
+        <div class="editorial-feature-card">
+          <div class="feature-image-col">
+            <img src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80" alt="Early morning spice market sellers" loading="lazy">
+            <span class="photo-credit">Photo: Kabir Verma, Mumbai Host</span>
+          </div>
+          <div class="feature-text-col">
+            <div class="magazine-meta">
+              <span class="magazine-issue">ISSUE 14 • CHRONICLES OF DAWN</span>
+              <span class="read-time">7 MIN READ</span>
+            </div>
+            <h2 class="magazine-headline">Why this 80-year-old market still wakes up before the rest of the city.</h2>
+            <p class="magazine-excerpt">
+              At 4:15 AM, when the rest of the metropolis is locked in slumber, the stone alleys of Dadar flower and spice market surge with sea breeze, marigold garlands, and the aroma of freshly ground coriander seeds. Meet the 3rd generation traders who refuse to sell online.
+            </p>
+            <div class="magazine-author">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Meera Sen" class="author-img">
+              <div>
+                <strong>Meera Sen</strong>
+                <span>Culinary Anthropologist & Host</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline" onclick="app.openStoryModal(1)">Read Editorial Story</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Local Events Calendar Section -->
+    <section class="section-padding bg-warm-sand" id="eventsSection">
+      <div class="container">
+        <div class="section-header-flex">
+          <div>
+            <span class="eyebrow">COMMUNITY CALENDAR</span>
+            <h2 class="section-title">What’s happening locally.</h2>
+            <p class="section-lead">Pop-up poetry readings, indie music evenings, and rooftop art swaps across neighborhoods.</p>
+          </div>
+          <div class="event-filter-pills" id="eventTimeFilter">
+            <button type="button" class="time-filter-btn active" data-time="all">All Dates</button>
+            <button type="button" class="time-filter-btn" data-time="weekend">This Weekend</button>
+            <button type="button" class="time-filter-btn" data-time="month">This Month</button>
+          </div>
+        </div>
+
+        <div class="events-grid" id="eventsGrid"></div>
+      </div>
+    </section>
+
+    <!-- Community Impact Metrics Section -->
+    <section class="section-padding impact-section" id="impactSection">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="eyebrow-accent">REGENERATIVE TOURISM</span>
+          <h2 class="section-title text-white">Travel should give back to the places you visit.</h2>
+          <p class="section-lead text-white-muted">When you book through LOCORA, the overwhelming majority of your expenditure stays directly within the host's household and neighborhood ecosystem.</p>
+          <span class="badge-demo">DEMO PLATFORM METRICS</span>
+        </div>
+
+        <div class="stats-counter-grid">
+          <div class="stat-card">
+            <span class="stat-number" data-target="2450">0</span>
+            <span class="stat-suffix">+</span>
+            <span class="stat-label">Independent Local Hosts</span>
+            <p class="stat-desc">Chefs, artisans, guides, and historians earning independent income.</p>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-number" data-target="18400">0</span>
+            <span class="stat-suffix">+</span>
+            <span class="stat-label">Experiences Discovered</span>
+            <p class="stat-desc">Intimate connections made outside standard tourist traps.</p>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-number" data-target="72">0</span>
+            <span class="stat-suffix">%</span>
+            <span class="stat-label">Revenue Retained Locally</span>
+            <p class="stat-desc">Direct economic yield preserved within host neighborhoods.</p>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-number" data-target="45">0</span>
+            <span class="stat-suffix">+</span>
+            <span class="stat-label">Historic Neighborhoods</span>
+            <p class="stat-desc">Active discovery clusters across 10 vibrant Indian cities.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works 3-Step Process -->
+    <section class="section-padding bg-ivory" id="howItWorksSection">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="eyebrow">SEAMLESS & SIMPLE</span>
+          <h2 class="section-title">How LOCORA Works</h2>
+          <p class="section-lead">Three thoughtful steps from curiosity to unforgettable memories.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">01</div>
+            <div class="step-icon-circle">
+              <i data-lucide="sliders"></i>
+            </div>
+            <h3>Tell us what you love</h3>
+            <p>Select your curiosity mood, neighborhood tastes, and preferred travel pace. We bypass generic recommendations.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">02</div>
+            <div class="step-icon-circle">
+              <i data-lucide="map-pin"></i>
+            </div>
+            <h3>Discover curated gems</h3>
+            <p>Browse intimate workshops, culinary walks, and rooftop studios vetted for community ethics and authentic storytelling.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">03</div>
+            <div class="step-icon-circle">
+              <i data-lucide="users"></i>
+            </div>
+            <h3>Meet passionate locals</h3>
+            <p>Experience the city through personal conversations, shared meals, and artisanal crafts you won't find in any souvenir shop.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- For Local Providers Banner CTA -->
+    <section class="provider-cta-section" id="hostSection">
+      <div class="container">
+        <div class="provider-banner-card">
+          <div class="provider-content-col">
+            <span class="eyebrow">FOR LOCAL MAKERS & CUSTODIANS</span>
+            <h2 class="section-title">Your city is your story. Turn your craft into community impact.</h2>
+            <p>Do you make heritage pottery, cook family recipes passed down over generations, or know secret architectural lanes? Share your knowledge directly with respectful travelers.</p>
+            <div class="provider-benefits">
+              <div class="benefit-item">
+                <i data-lucide="check-circle-2"></i>
+                <span>Direct digital visibility without middlemen</span>
+              </div>
+              <div class="benefit-item">
+                <i data-lucide="check-circle-2"></i>
+                <span>Flexible scheduling and fair earnings</span>
+              </div>
+              <div class="benefit-item">
+                <i data-lucide="check-circle-2"></i>
+                <span>Support and community workshops</span>
+              </div>
+            </div>
+            <div class="provider-actions">
+              <button type="button" class="btn btn-primary" id="openHostOnboardBtn">Become a Host</button>
+              <button type="button" class="btn btn-outline" id="learnHostProcessBtn">Learn How It Works</button>
+            </div>
+          </div>
+          <div class="provider-image-col">
+            <img src="https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=1000&q=80" alt="Artisan carving wooden stamp" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Slider Section -->
+    <section class="section-padding bg-ivory" id="testimonialsSection">
+      <div class="container">
+        <div class="section-header-flex">
+          <div>
+            <span class="eyebrow">TRAVELER VOICES</span>
+            <h2 class="section-title">Stories from the road.</h2>
+          </div>
+          <div class="slider-nav-controls">
+            <button type="button" class="slider-btn" id="prevTestimonialBtn" aria-label="Previous testimonial">
+              <i data-lucide="chevron-left"></i>
+            </button>
+            <button type="button" class="slider-btn" id="nextTestimonialBtn" aria-label="Next testimonial">
+              <i data-lucide="chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="testimonial-slider-viewport">
+          <div class="testimonial-track" id="testimonialTrack">
+            <div class="testimonial-slide active">
+              <div class="testimonial-quote-mark">“</div>
+              <p class="testimonial-quote">
+                I stopped looking for Mumbai's top 10 attractions and booked a 5 AM breakfast walk with chef Aarav. We sat on plastic stools drinking cutting chai while listening to 40 years of market stories. It completely redefined how I view the city.
+              </p>
+              <div class="testimonial-author">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Tanya Sharma" class="author-avatar">
+                <div>
+                  <strong>Tanya Sharma</strong>
+                  <span>Cultural Anthropologist, Traveled to Mumbai</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="testimonial-slide">
+              <div class="testimonial-quote-mark">“</div>
+              <p class="testimonial-quote">
+                Finding Meera’s terracotta studio in Kasba Peth Pune felt like unlocking a secret level of Maharashtra. Molding clay next to her father while eating home-baked sweets is something you cannot buy from a tour operator.
+              </p>
+              <div class="testimonial-author">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80" alt="David Miller" class="author-avatar">
+                <div>
+                  <strong>David Miller</strong>
+                  <span>Solo Backpacker, Traveled to Pune</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="testimonial-slide">
+              <div class="testimonial-quote-mark">“</div>
+              <p class="testimonial-quote">
+                I have lived in Delhi for seven years and still discovered alleys in Shahjahanabad I never knew existed through Locora. It is as much a gift for long-term residents as it is for curious travelers.
+              </p>
+              <div class="testimonial-author">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" alt="Rohit Mathur" class="author-avatar">
+                <div>
+                  <strong>Rohit Mathur</strong>
+                  <span>Architect, Delhi Resident</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="section-padding newsletter-section">
+      <div class="container">
+        <div class="newsletter-card text-center">
+          <span class="eyebrow">THE LOCAL DISPATCH</span>
+          <h2 class="section-title">Get the local version of your next trip.</h2>
+          <p class="section-lead">Secret food maps, host interviews, and neighborhood guides delivered bi-weekly. No algorithmic fluff or spam.</p>
+
+          <form id="newsletterForm" class="newsletter-form" novalidate>
+            <div class="input-with-button">
+              <input type="email" id="newsletterEmail" placeholder="Enter your email address..." aria-label="Email address for newsletter" required>
+              <button type="submit" class="btn btn-primary" id="newsletterSubmitBtn">Join LOCORA</button>
+            </div>
+            <span class="form-micro-text">Join 32,000+ curious travelers. Unsubscribe with one click anytime.</span>
+            <div class="form-message" id="newsletterFeedback"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="container footer-top-grid">
+      <div class="footer-brand-col">
+        <a href="#" class="brand-logo footer-logo">
+          <svg class="brand-icon" viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="16" cy="16" r="13" stroke="currentColor" stroke-opacity="0.3"/>
+            <path d="M16 6 C10.477 6 6 10.477 6 16 C6 22 16 27 16 27 C16 27 26 22 26 16 C26 10.477 21.523 6 16 6 Z"/>
+            <circle cx="16" cy="14" r="3" fill="currentColor"/>
+          </svg>
+          <span class="brand-name">LOCORA</span>
+        </a>
+        <p class="footer-tagline">“Find the places, people, flavors, and stories that make a city feel local.”</p>
+        <p class="footer-mission">Connecting curious travelers with authentic culture, food, and craft while helping local creators thrive.</p>
+      </div>
+
+      <div class="footer-nav-col">
+        <h4 class="footer-col-heading">Explore</h4>
+        <ul class="footer-links">
+          <li><a href="#exploreSection">All Experiences</a></li>
+          <li><a href="#foodSection">Culinary Walks</a></li>
+          <li><a href="#cultureSection">Artisan Workshops</a></li>
+          <li><a href="#gemsSection">Hidden Gems</a></li>
+          <li><a href="#eventsSection">Community Calendar</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-nav-col">
+        <h4 class="footer-col-heading">For Locals</h4>
+        <ul class="footer-links">
+          <li><a href="#hostSection" id="footerBecomeHostLink">Become a Host</a></li>
+          <li><a href="#" onclick="app.showToast('Host Standards & Guidelines Guide opened', 'info')">Host Standards</a></li>
+          <li><a href="#" onclick="app.showToast('Community Fair Revenue Model opened', 'info')">Community Pricing</a></li>
+          <li><a href="#" onclick="app.showToast('Support portal active', 'info')">Creator Support Hub</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-nav-col">
+        <h4 class="footer-col-heading">Cities</h4>
+        <ul class="footer-links" id="footerCityList">
+          <li><a href="#" onclick="app.selectCity('Mumbai'); return false;">Mumbai</a></li>
+          <li><a href="#" onclick="app.selectCity('Pune'); return false;">Pune</a></li>
+          <li><a href="#" onclick="app.selectCity('Nagpur'); return false;">Nagpur</a></li>
+          <li><a href="#" onclick="app.selectCity('Delhi'); return false;">Delhi</a></li>
+          <li><a href="#" onclick="app.selectCity('Bengaluru'); return false;">Bengaluru</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-nav-col">
+        <h4 class="footer-col-heading">Ethics & Values</h4>
+        <ul class="footer-links">
+          <li><a href="#" onclick="app.showToast('Regenerative tourism charter loaded', 'info')">Local Impact Charter</a></li>
+          <li><a href="#" onclick="app.showToast('Fair compensation pledge active', 'info')">Fair Compensation</a></li>
+          <li><a href="#" onclick="app.showToast('Heritage preservation guidelines active', 'info')">Heritage Preservation</a></li>
+          <li><a href="#" onclick="app.showToast('Privacy Policy viewed', 'info')">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom-bar">
+      <p class="copyright-text">© 2026 LOCORA Inc. Made for curious travelers and regenerative communities.</p>
+      <div class="footer-social-links">
+        <a href="#" aria-label="Instagram" class="social-icon"><i data-lucide="instagram"></i></a>
+        <a href="#" aria-label="Twitter" class="social-icon"><i data-lucide="twitter"></i></a>
+        <a href="#" aria-label="YouTube" class="social-icon"><i data-lucide="youtube"></i></a>
+        <a href="#" aria-label="LinkedIn" class="social-icon"><i data-lucide="linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================== -->
+  <!-- MODAL DIALOGS                                  -->
+  <!-- ============================================== -->
+
+  <!-- 1. Search Overlay Modal -->
+  <div class="modal-backdrop" id="searchModal" role="dialog" aria-modal="true" aria-labelledby="searchModalTitle">
+    <div class="modal-dialog search-modal-dialog">
+      <div class="search-modal-header">
+        <div class="search-input-wrapper">
+          <i data-lucide="search"></i>
+          <input type="text" id="globalSearchInput" placeholder="Search experiences, cities, crafts, hosts, or foods..." autocomplete="off">
+        </div>
+        <button type="button" class="modal-close-btn" id="closeSearchModal" aria-label="Close search">✕</button>
+      </div>
+      <div class="search-modal-body">
+        <div class="quick-tags-section">
+          <span class="quick-title">Popular searches:</span>
+          <div class="quick-tags-row">
+            <button type="button" class="search-shortcut-pill" data-query="Street food">Street food</button>
+            <button type="button" class="search-shortcut-pill" data-query="Pottery">Pottery workshops</button>
+            <button type="button" class="search-shortcut-pill" data-query="Heritage">Heritage walks</button>
+            <button type="button" class="search-shortcut-pill" data-query="Market">Morning markets</button>
+            <button type="button" class="search-shortcut-pill" data-query="Pune">Pune experiences</button>
+          </div>
+        </div>
+        <div class="search-live-results" id="searchLiveResults"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Experience Detail Modal -->
+  <div class="modal-backdrop" id="experienceModal" role="dialog" aria-modal="true" aria-labelledby="expDetailTitle">
+    <div class="modal-dialog exp-modal-dialog">
+      <button type="button" class="modal-close-floating" id="closeExpModal" aria-label="Close experience detail">✕</button>
+      <div class="exp-modal-content-scroll" id="expModalContent"></div>
+    </div>
+  </div>
+
+  <!-- 3. Booking Modal -->
+  <div class="modal-backdrop" id="bookingModal" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+    <div class="modal-dialog booking-modal-dialog">
+      <div class="booking-modal-header">
+        <div>
+          <span class="booking-eyebrow">RESERVE EXPERIENCE</span>
+          <h3 id="bookingModalTitle">Book Your Spot</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeBookingModal" aria-label="Close booking modal">✕</button>
+      </div>
+
+      <div class="booking-modal-body" id="bookingModalBody">
+        <div class="booking-summary-pill" id="bookingTargetPill"></div>
+
+        <form id="bookingForm" class="booking-form" novalidate>
+          <div class="form-row-2">
+            <div class="form-control">
+              <label for="bookDate"><i data-lucide="calendar"></i> Date</label>
+              <input type="date" id="bookDate" required>
+            </div>
+            <div class="form-control">
+              <label for="bookTime"><i data-lucide="clock"></i> Time Slot</label>
+              <select id="bookTime" required>
+                <option value="09:00 AM">09:00 AM — Morning Walk</option>
+                <option value="11:30 AM">11:30 AM — Midday Session</option>
+                <option value="04:00 PM" selected>04:00 PM — Afternoon Workshop</option>
+                <option value="06:30 PM">06:30 PM — Sunset Gathering</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label for="bookGuests"><i data-lucide="users"></i> Number of Guests</label>
+            <div class="guest-stepper">
+              <button type="button" class="stepper-btn" id="guestMinusBtn">-</button>
+              <input type="number" id="bookGuests" value="1" min="1" max="8" readonly>
+              <button type="button" class="stepper-btn" id="guestPlusBtn">+</button>
+            </div>
+          </div>
+
+          <div class="price-breakdown-card">
+            <div class="price-line">
+              <span id="pricePerPersonLabel">₹0 × 1 Guest</span>
+              <span id="priceSubtotal">₹0</span>
+            </div>
+            <div class="price-line text-muted">
+              <span>Local Community Fund (5%)</span>
+              <span id="priceCommunityFund">₹0</span>
+            </div>
+            <div class="price-line text-muted">
+              <span>Platform Service Fee</span>
+              <span id="priceServiceFee">₹40</span>
+            </div>
+            <div class="price-divider"></div>
+            <div class="price-line total-line">
+              <strong>Total (INR)</strong>
+              <strong id="priceFinalTotal">₹0</strong>
+            </div>
+          </div>
+
+          <div class="booking-guarantee-note">
+            <i data-lucide="shield-check"></i>
+            <span>Zero cancellation fees up to 24 hours prior. Host receives direct compensation upon completion.</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="confirmBookingBtn">
+            Confirm & Reserve Spot
+          </button>
+        </form>
+
+        <div class="booking-success-view hidden" id="bookingSuccessView">
+          <div class="success-icon-wrap">
+            <i data-lucide="check"></i>
+          </div>
+          <h3>Your Experience is Reserved!</h3>
+          <p>We’ve dispatched your host details and neighborhood meeting instructions to your email.</p>
+          <div class="receipt-box" id="bookingReceiptDetails"></div>
+          <div class="success-actions">
+            <button type="button" class="btn btn-primary btn-block" id="closeSuccessBookingBtn">Return to Discoveries</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Favorites Drawer Modal -->
+  <div class="modal-backdrop" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favModalTitle">
+    <div class="modal-dialog favorites-dialog">
+      <div class="favorites-header">
+        <div>
+          <h3 id="favModalTitle">Your Saved Discoveries</h3>
+          <span class="fav-count-text" id="favSubCount">0 items saved</span>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeFavoritesModal" aria-label="Close saved items">✕</button>
+      </div>
+      <div class="favorites-body" id="favoritesList"></div>
+    </div>
+  </div>
+
+  <!-- 5. User Profile / Auth Modal -->
+  <div class="modal-backdrop" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="modal-dialog auth-dialog">
+      <div class="auth-header">
+        <h3 id="authModalTitle">Welcome to LOCORA</h3>
+        <button type="button" class="modal-close-btn" id="closeAuthModal" aria-label="Close authentication">✕</button>
+      </div>
+
+      <div class="auth-body">
+        <div id="authFormsContainer">
+          <div class="auth-tabs" role="tablist">
+            <button type="button" class="auth-tab-btn active" id="tabLogin" role="tab" aria-selected="true">Sign In</button>
+            <button type="button" class="auth-tab-btn" id="tabRegister" role="tab" aria-selected="false">Create Account</button>
+          </div>
+
+          <form id="loginForm" class="auth-form" novalidate>
+            <div class="form-control">
+              <label for="loginEmail">Email Address</label>
+              <input type="email" id="loginEmail" placeholder="you@domain.com" required>
+            </div>
+            <div class="form-control">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+          </form>
+
+          <form id="registerForm" class="auth-form hidden" novalidate>
+            <div class="form-control">
+              <label for="regName">Full Name</label>
+              <input type="text" id="regName" placeholder="e.g. Alex Morgan" required>
+            </div>
+            <div class="form-control">
+              <label for="regEmail">Email Address</label>
+              <input type="email" id="regEmail" placeholder="you@domain.com" required>
+            </div>
+            <div class="form-control">
+              <label for="regPassword">Create Password</label>
+              <input type="password" id="regPassword" placeholder="Min. 6 characters" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Create Traveler Account</button>
+          </form>
+
+          <div class="auth-social-divider"><span>OR CONTINUE WITH</span></div>
+          <div class="social-auth-buttons">
+            <button type="button" class="btn btn-outline btn-social" id="googleMockBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.4 8.9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/><path fill="#FBBC05" d="M5.3 14.7c-.2-.7-.4-1.5-.4-2.7 0-1.1.2-1.9.4-2.7L1.6 6.4C.6 8.3 0 10.1 0 12s.6 3.7 1.6 5.6l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.8-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.9C3.5 20.4 7.4 23 12 23z"/></svg>
+              Google
+            </button>
+            <button type="button" class="btn btn-outline btn-social" id="appleMockBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 1.01-2.87-.96.04-2.13.64-2.79 1.43-.58.68-1.1 1.77-1.02 2.83 1.07.08 2.18-.64 2.8-1.39z"/></svg>
+              Apple
+            </button>
+          </div>
+        </div>
+
+        <div id="userProfileContainer" class="hidden">
+          <div class="profile-header-card">
+            <div class="profile-avatar-large">AM</div>
+            <div>
+              <h4 id="profileNameDisplay">Alex Morgan</h4>
+              <p class="profile-meta"><i data-lucide="map-pin"></i> Mumbai • Explorer since 2026</p>
+            </div>
+          </div>
+          <div class="profile-stats-row">
+            <div class="p-stat">
+              <strong id="userTripsCount">1</strong>
+              <span>Trips Reserved</span>
+            </div>
+            <div class="p-stat">
+              <strong id="userSavesCount">0</strong>
+              <span>Saved Discoveries</span>
+            </div>
+            <div class="p-stat">
+              <strong>Level 2</strong>
+              <span>Local Patron</span>
+            </div>
+          </div>
+          <div class="profile-trips-section">
+            <h5>Upcoming Immersion</h5>
+            <div class="trip-micro-card" id="upcomingTripCard">
+              <div>
+                <strong>Sunrise Breakfast with Local Chef</strong>
+                <p class="text-muted">Mumbai • Tomorrow at 06:30 AM</p>
+              </div>
+              <span class="badge-confirmed">Confirmed</span>
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline btn-block" id="logoutBtn">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Host Application Onboarding Modal -->
+  <div class="modal-backdrop" id="hostModal" role="dialog" aria-modal="true" aria-labelledby="hostModalTitle">
+    <div class="modal-dialog host-modal-dialog">
+      <div class="host-modal-header">
+        <div>
+          <span class="booking-eyebrow">COMMUNITY CREATORS</span>
+          <h3 id="hostModalTitle">Share Your City With The World</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeHostModal" aria-label="Close host registration">✕</button>
+      </div>
+
+      <div class="host-modal-body">
+        <div class="host-steps-tracker">
+          <span class="step-pill active">1. Profile</span>
+          <span class="step-pill">2. Experience Idea</span>
+          <span class="step-pill">3. Pricing</span>
+        </div>
+
+        <form id="hostApplicationForm" class="host-form" novalidate>
+          <div class="form-row-2">
+            <div class="form-control">
+              <label for="hostFullName">Your Name</label>
+              <input type="text" id="hostFullName" placeholder="e.g. Radhika Apte" required>
+            </div>
+            <div class="form-control">
+              <label for="hostCitySelect">Your City</label>
+              <select id="hostCitySelect" required>
+                <option value="Mumbai">Mumbai</option>
+                <option value="Pune">Pune</option>
+                <option value="Nagpur">Nagpur</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Bengaluru">Bengaluru</option>
+                <option value="Goa">Goa</option>
+                <option value="Jaipur">Jaipur</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label for="hostExperienceTitle">Title of Your Experience</label>
+            <input type="text" id="hostExperienceTitle" placeholder="e.g. Traditional Copperware Beating & Stories in Old Pune" required>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-control">
+              <label for="hostCategorySelect">Primary Category</label>
+              <select id="hostCategorySelect" required>
+                <option value="craft">Craft & Making</option>
+                <option value="food">Culinary & Kitchen</option>
+                <option value="culture">Heritage Walk</option>
+                <option value="art">Indie Art / Studio</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label for="hostPricePerPerson">Price per Guest (INR)</label>
+              <input type="number" id="hostPricePerPerson" placeholder="₹950" min="300" max="10000" required>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label for="hostStoryBio">Tell us your story & what travelers will do</label>
+            <textarea id="hostStoryBio" rows="3" placeholder="Describe the authentic neighborhood context, generational memories, or craft technique you will share..." required></textarea>
+          </div>
+
+          <div class="host-submit-row">
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Submit Host Application</button>
+          </div>
+        </form>
+
+        <div class="host-success-state hidden" id="hostSuccessState">
+          <div class="success-icon-wrap">
+            <i data-lucide="sparkles"></i>
+          </div>
+          <h3>Application Submitted!</h3>
+          <p>Thank you for championing your neighborhood. Our community curator will review your concept and connect within 48 hours for a virtual tea chat.</p>
+          <button type="button" class="btn btn-outline" id="closeHostSuccessBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Host Detail Bio Modal -->
+  <div class="modal-backdrop" id="hostBioModal" role="dialog" aria-modal="true" aria-labelledby="hostBioName">
+    <div class="modal-dialog host-bio-dialog">
+      <button type="button" class="modal-close-btn" id="closeHostBioModal" aria-label="Close host bio">✕</button>
+      <div id="hostBioContent" class="host-bio-content"></div>
+    </div>
+  </div>
+
+  <!-- 8. Editorial Story Modal -->
+  <div class="modal-backdrop" id="storyModal" role="dialog" aria-modal="true" aria-labelledby="storyModalHeadline">
+    <div class="modal-dialog story-modal-dialog">
+      <button type="button" class="modal-close-floating" id="closeStoryModal" aria-label="Close story">✕</button>
+      <div id="storyModalContent" class="story-modal-scroll"></div>
+    </div>
+  </div>
+
+  <!-- 9. Traveler Personality Quiz Modal -->
+  <div class="modal-backdrop" id="quizModal" role="dialog" aria-modal="true" aria-labelledby="quizModalTitle">
+    <div class="modal-dialog quiz-dialog">
+      <div class="quiz-header">
+        <div>
+          <span class="booking-eyebrow">DISCOVERY QUIZ</span>
+          <h3 id="quizModalTitle">What Kind of Explorer Are You?</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeQuizModal" aria-label="Close quiz">✕</button>
+      </div>
+
+      <div class="quiz-body" id="quizBody">
+        <div id="quizQuestionCard" class="quiz-question-card"></div>
+
+        <div id="quizResultCard" class="quiz-result-card hidden">
+          <div class="quiz-badge-icon">🌿</div>
+          <span class="eyebrow">YOUR TRAVEL ARCHETYPE</span>
+          <h2 id="archetypeName">The Culture & Craft Custodian</h2>
+          <p id="archetypeDesc">You cherish hands-on memories, generational techniques, and conversation over fast-paced checklists.</p>
+          <div class="quiz-curated-recommendations" id="quizRecommendations"></div>
+          <button type="button" class="btn btn-primary btn-block" id="applyQuizFindingsBtn">Explore Matching Experiences</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ==========================================================
+       INLINE SCRIPT / LOGIC ENGINE
+       ========================================================== -->
+  <script>
+    const CITIES_DATA = [
+      { name: "Mumbai", state: "Maharashtra", lat: 18.9220, lng: 72.8347, tagline: "Find Mumbai beyond Marine Drive." },
+      { name: "Pune", state: "Maharashtra", lat: 18.5204, lng: 73.8567, tagline: "Find Pune beyond the usual IT corridors." },
+      { name: "Nagpur", state: "Maharashtra", lat: 21.1458, lng: 79.0882, tagline: "Discover Nagpur through orange groves & heritage mews." },
+      { name: "Delhi", state: "Delhi NCR", lat: 28.6507, lng: 77.2334, tagline: "Find Delhi beyond monuments and crowded plazas." },
+      { name: "Bengaluru", state: "Karnataka", lat: 12.9716, lng: 77.5946, tagline: "Discover the indie gardens, filter kaapi & studio nooks." },
+      { name: "Goa", state: "Goa", lat: 15.4989, lng: 73.8278, tagline: "Discover the Konkani hinterlands and river quietude." },
+      { name: "Jaipur", state: "Rajasthan", lat: 26.9124, lng: 75.7873, tagline: "Find Jaipur beyond the souvenir bazaar traps." }
+    ];
+
+    const EXPERIENCES_DATA = [
+      {
+        id: "exp-1",
+        title: "Sunrise Breakfast & Spice Walk with a Local Chef",
+        city: "Mumbai",
+        category: "food",
+        tags: ["food", "morning", "culture", "street"],
+        price: 850,
+        rating: 4.9,
+        reviewsCount: 128,
+        duration: "short",
+        durationLabel: "2.5 Hours",
+        lat: 18.9280,
+        lng: 72.8330,
+        image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
+        gallery: [
+          "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80"
+        ],
+        host: {
+          name: "Chef Aarav Merchant",
+          role: "Culinary Historian & Home Chef",
+          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+          story: "Born in South Mumbai, Aarav spent 14 years uncovering heritage recipes from Koli fishing docks and traditional Irani breakfast bakeries."
+        },
+        description: "Bypass generic morning hotel buffets. Walk the stone lanes of Colaba and Fort as morning delivery boys bicycle past. We'll taste 80-year-old sourdough brun-maska, explore fresh curry leaf trades, and finish with family-recipe kheema pav.",
+        included: ["All food tastings (5 distinct stalls)", "Heirloom tea ceremony", "Printed neighborhood recipe zine", "Local neighborhood guide"]
+      },
+      {
+        id: "exp-2",
+        title: "4th Generation Terracotta Wheel & Chai in Kasba Peth",
+        city: "Pune",
+        category: "craft",
+        tags: ["craft", "art", "hands-on"],
+        price: 950,
+        rating: 4.9,
+        reviewsCount: 84,
+        duration: "half",
+        durationLabel: "3 Hours",
+        lat: 18.5210,
+        lng: 73.8570,
+        image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
+        gallery: [
+          "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=800&q=80"
+        ],
+        host: {
+          name: "Meera & Shridhar Kumbhar",
+          role: "Generational Clay Custodians",
+          avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
+          story: "The Kumbhar family has shaped terracotta pottery in the heart of historic Pune since 1898, preserving methods unaffected by industrial plastics."
+        },
+        description: "Sit at a manual pottery wheel inside a historic courtyard home. Shridhar will guide your fingers to feel red river clay centering, followed by tea served in handmade kulhads and local bakarwadi.",
+        included: ["Raw terracotta clay & tools", "Your finished fired piece mailed home", "Home-brewed ginger cardamom chai", "Kasba Peth history walk"]
+      },
+      {
+        id: "exp-3",
+        title: "Hidden Shahjahanabad Rooftops & Saffron Exchange",
+        city: "Delhi",
+        category: "culture",
+        tags: ["culture", "history", "food", "walk"],
+        price: 1200,
+        rating: 4.8,
+        reviewsCount: 162,
+        duration: "half",
+        durationLabel: "3.5 Hours",
+        lat: 28.6540,
+        lng: 77.2300,
+        image: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=800&q=80",
+        gallery: [
+          "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80"
+        ],
+        host: {
+          name: "Rohan Farooqui",
+          role: "Architect & Oral Historian",
+          avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
+          story: "Rohan's ancestors documented Mughal architecture. He leads walks focused on hidden residential courtyards (havelis) closed to standard buses."
+        },
+        description: "Wander past spice sacks in Asia's oldest spice bazaar, duck into a carved 200-year-old sandstone courtyard, and ascend a private rooftop overlooking the minarets while savoring slow-simmered Kashmiri kahwa.",
+        included: ["Private haveli rooftop access", "Freshly grounded spice tasting", "Traditional sweet jalebis", "Hand-drawn architectural route map"]
+      },
+      {
+        id: "exp-4",
+        title: "Orange Orchard Table & Saoji Cooking Secrets",
+        city: "Nagpur",
+        category: "food",
+        tags: ["food", "nature", "hands-on", "home"],
+        price: 750,
+        rating: 4.9,
+        reviewsCount: 54,
+        duration: "half",
+        durationLabel: "3 Hours",
+        lat: 21.1460,
+        lng: 79.0880,
+        image: "https://images.unsplash.com/photo-1613564834361-9436948817d1?auto=format&fit=crop&w=800&q=80",
+        gallery: ["https://images.unsplash.com/photo-1613564834361-9436948817d1?auto=format&fit=crop&w=1000&q=80"],
+        host: {
+          name: "Ananya Deshmukh",
+          role: "Traditional Saoji Cook & Farmer",
+          avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80",
+          story: "Preserving the fiery, 24-spice Saoji heritage of the Halba Koshti community on an organic family orchard on the fringes of Nagpur."
+        },
+        description: "Pluck seasonal citrus directly under orchard shade, followed by an intimate stone-mortar spice grinding workshop and authentic rustic lunch served on banana leaves.",
+        included: ["Full regional Saoji thali", "Fresh citrus tasting", "Stone-grinding spice kit to take home", "Farm walk"]
+      },
+      {
+        id: "exp-5",
+        title: "Indie Art Studio Evening & Botanical Cyanotypes",
+        city: "Bengaluru",
+        category: "art",
+        tags: ["art", "craft", "nature"],
+        price: 900,
+        rating: 4.9,
+        reviewsCount: 76,
+        duration: "short",
+        durationLabel: "2 Hours",
+        lat: 12.9730,
+        lng: 77.5990,
+        image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80",
+        gallery: ["https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1000&q=80"],
+        host: {
+          name: "Tara Nair",
+          role: "Visual Artist & Printmaker",
+          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+          story: "Tara's studio in Indiranagar fosters independent print techniques using salvaged flora from Bengaluru’s historic botanical canopies."
+        },
+        description: "Learn 19th-century sun-printing (cyanotype) using neighborhood leaves, sun exposure, and chemical baths. Create two archival prints while sipping artisanal filter coffee.",
+        included: ["Fine art watercolor paper", "Botanical specimens", "Two framed cyanotype prints", "South Indian specialty coffee"]
+      },
+      {
+        id: "exp-6",
+        title: "Konkani Backwater Kitchen Table & Fisherman Tales",
+        city: "Goa",
+        category: "food",
+        tags: ["food", "nature", "slow", "home"],
+        price: 1100,
+        rating: 4.9,
+        reviewsCount: 92,
+        duration: "half",
+        durationLabel: "4 Hours",
+        lat: 15.5000,
+        lng: 73.8300,
+        image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
+        gallery: ["https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1000&q=80"],
+        host: {
+          name: "Savio & Maria Fernandes",
+          role: "River Fisher & Traditional Cook",
+          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+          story: "Far from the northern resort beaches, Savio and Maria welcome guests to their 70-year-old riverfront home in Divar Island."
+        },
+        description: "Take a wooden ferry to a quiet island. Savor wild mud-crab curry or fresh tender jackfruit cooked with freshly pressed coconut milk and roasted kokum.",
+        included: ["Ferry ride coordination", "Multi-course Konkani banquet", "Kokum digestive beverage", "Village plantation stroll"]
+      }
+    ];
+
+    const HOSTS_DATA = [
+      {
+        name: "Aarav Merchant",
+        role: "Food Historian",
+        city: "Mumbai",
+        rating: 4.9,
+        expCount: 3,
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+        bio: "Uncovering forgotten Irani cafes and Koli coastal heritage dishes for curious travelers since 2018."
+      },
+      {
+        name: "Meera Kumbhar",
+        role: "Master Potter",
+        city: "Pune",
+        rating: 4.9,
+        expCount: 2,
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80",
+        bio: "Keeping the wheels turning in historic Kasba Peth with ancestral hand-thrown terracotta techniques."
+      },
+      {
+        name: "Kabir Verma",
+        role: "Documentary Photographer",
+        city: "Mumbai",
+        rating: 4.8,
+        expCount: 4,
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+        bio: "Guiding dawn explorations through wholesale flower markets and vintage port dockyards."
+      },
+      {
+        name: "Ananya Deshmukh",
+        role: "Culinary Custodian",
+        city: "Nagpur",
+        rating: 4.9,
+        expCount: 2,
+        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+        bio: "Sharing traditional Halba Koshti stone-ground recipes on her sustainable citrus orchard."
+      }
+    ];
+
+    const EVENTS_DATA = [
+      {
+        id: "evt-1",
+        title: "Indie Rooftop Acoustic Evening & Zine Exchange",
+        city: "Mumbai",
+        date: "This Saturday, 6:30 PM",
+        timeTag: "weekend",
+        location: "Bandra West Heritage Alley",
+        price: "₹350 (Includes Chai)",
+        attendees: 18
+      },
+      {
+        id: "evt-2",
+        title: "Weekend Kasba Artisan Flea & Clay Demo",
+        city: "Pune",
+        date: "This Sunday, 10:00 AM",
+        timeTag: "weekend",
+        location: "Kasba Peth Courtyard",
+        price: "Free Entry",
+        attendees: 42
+      },
+      {
+        id: "evt-3",
+        title: "Old Havelis Twilight Architecture Stroll",
+        city: "Delhi",
+        date: "Next Thursday, 5:00 PM",
+        timeTag: "month",
+        location: "Chandni Chowk Gate 3",
+        price: "₹500",
+        attendees: 12
+      }
+    ];
+
+    const STORIES_DATA = {
+      1: {
+        title: "The Whispering Chai Counter of Fort",
+        author: "Meera Sen",
+        city: "Mumbai",
+        image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+        content: `Behind an unassuming turquoise doorway on Mint Road lies a café untouched by the passage of digital billboards and fast-paced commercial trends. Established in 1932 by two brothers who traveled across the Arabian Sea, this small café continues to bake crusty brun bread twice every morning before the suburban trains roar to life.\n\n"We never modernized because hospitality cannot be rushed," explains the present custodian. Here, the sourdough starter is fed daily at 3 AM. Regulars include elderly clerks, young independent poets, and travelers fortunate enough to find this sanctuary. Locora supports this establishment by channeling intimate morning gatherings directly to their table.`
+      },
+      2: {
+        title: "The 4th Generation Terracotta Mews",
+        author: "Rohan Farooqui",
+        city: "Pune",
+        image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+        content: `Kasba Peth in Pune was planned centuries ago around community guilds. While machine manufacturing took over commercial markets, the Kumbhar lane preserved hand-thrown terracotta techniques. Walking through the lane smells of moist river sediment and burning dry husks.\n\nWhen you participate in an immersion here, you aren't a bystander taking photos from a bus window; you sit on the same low wooden benches where clay is centered, sharing tea and sustaining an irreplaceable craft.`
+      },
+      3: {
+        title: "The Secret Rooftop Over the Spice Exchange",
+        author: "Kabir Verma",
+        city: "Delhi",
+        image: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=1200&q=80",
+        content: `Khari Baoli market is famous for sensory intensity, but few visitors realize that above the crowded ground alleys lies an elevated network of open terraces. Historically used by merchants to dry saffron threads and cardamom pods in the desert winter breeze, these rooftops offer sweeping vistas of Old Delhi minarets.\n\nLocora hosts partner with haveli owners to grant respectful travelers quiet access during sunset, far away from commercial tourist buses.`
+      }
+    };
+
+    class LocoraApp {
+      constructor() {
+        this.state = {
+          selectedCity: localStorage.getItem("locora_city") || "Mumbai",
+          activeMood: "all",
+          searchQuery: "",
+          filterCategory: "all",
+          filterPrice: "all",
+          filterDuration: "all",
+          filterRating: "all",
+          sortBy: "recommended",
+          favorites: JSON.parse(localStorage.getItem("locora_favorites") || "[]"),
+          userPreferences: JSON.parse(localStorage.getItem("locora_preferences") || "[]"),
+          currentUser: JSON.parse(localStorage.getItem("locora_user") || '{"name":"Alex Morgan","email":"alex@curious.com","trips":1}'),
+          activeBookingExp: null,
+          bookingGuests: 1,
+          mapInstance: null,
+          mapMarkers: []
+        };
+
+        this.initDOM();
+        this.initLeafletMap();
+        this.bindEvents();
+        this.renderAll();
+        this.initCounters();
+        this.initScrollListener();
+      }
+
+      initDOM() {
+        this.elements = {
+          scrollProgress: document.getElementById("scrollProgress"),
+          header: document.getElementById("mainHeader"),
+          cityDropdownBtn: document.getElementById("cityDropdownBtn"),
+          cityDropdownMenu: document.getElementById("cityDropdownMenu"),
+          currentCityDisplay: document.getElementById("currentCityDisplay"),
+          heroHeadline: document.getElementById("heroHeadline"),
+          heroLocationInput: document.getElementById("heroLocationInput"),
+          heroCuriosityInput: document.getElementById("heroCuriosityInput"),
+          heroSearchAction: document.getElementById("heroSearchAction"),
+          moodChipsTrack: document.getElementById("moodChipsTrack"),
+          experienceGrid: document.getElementById("experienceGrid"),
+          experienceEmptyState: document.getElementById("experienceEmptyState"),
+          resultsCountLabel: document.getElementById("resultsCountLabel"),
+          filterCategorySelect: document.getElementById("filterCategorySelect"),
+          filterPriceSelect: document.getElementById("filterPriceSelect"),
+          filterDurationSelect: document.getElementById("filterDurationSelect"),
+          filterRatingSelect: document.getElementById("filterRatingSelect"),
+          sortSelect: document.getElementById("sortSelect"),
+          resetFiltersBtn: document.getElementById("resetFiltersBtn"),
+          preferenceTagsContainer: document.getElementById("preferenceTagsContainer"),
+          profileStatusBar: document.getElementById("profileStatusBar"),
+          profileStatusText: document.getElementById("profileStatusText"),
+          personalizedList: document.getElementById("personalizedList"),
+          curiosityMatchesTitle: document.getElementById("curiosityMatchesTitle"),
+          hostsGrid: document.getElementById("hostsGrid"),
+          foodShowcaseGrid: document.getElementById("foodShowcaseGrid"),
+          cultureGrid: document.getElementById("cultureGrid"),
+          eventsGrid: document.getElementById("eventsGrid"),
+          favCountBadge: document.getElementById("favCountBadge"),
+          toastContainer: document.getElementById("toastContainer"),
+          tripScenarioContent: document.getElementById("tripScenarioContent"),
+          mapPlacesList: document.getElementById("mapPlacesList"),
+          mapCurrentCityBadge: document.getElementById("mapCurrentCityBadge")
+        };
+      }
+
+      bindEvents() {
+        this.elements.cityDropdownBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isOpen = this.elements.cityDropdownMenu.classList.toggle("show");
+          this.elements.cityDropdownBtn.setAttribute("aria-expanded", isOpen);
+        });
+
+        document.addEventListener("click", () => {
+          this.elements.cityDropdownMenu.classList.remove("show");
+          this.elements.cityDropdownBtn.setAttribute("aria-expanded", "false");
+        });
+
+        this.elements.moodChipsTrack.addEventListener("click", (e) => {
+          const chip = e.target.closest(".mood-chip");
+          if (!chip) return;
+          this.elements.moodChipsTrack.querySelectorAll(".mood-chip").forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          this.state.activeMood = chip.dataset.mood;
+          this.applyFilters();
+          this.showToast(`Showing experiences for: ${chip.textContent.trim()}`, "info");
+        });
+
+        const triggerFilter = () => {
+          this.state.filterCategory = this.elements.filterCategorySelect.value;
+          this.state.filterPrice = this.elements.filterPriceSelect.value;
+          this.state.filterDuration = this.elements.filterDurationSelect.value;
+          this.state.filterRating = this.elements.filterRatingSelect.value;
+          this.state.sortBy = this.elements.sortSelect.value;
+          this.applyFilters();
+        };
+
+        [this.elements.filterCategorySelect, this.elements.filterPriceSelect, this.elements.filterDurationSelect, this.elements.filterRatingSelect, this.elements.sortSelect]
+          .forEach(sel => sel.addEventListener("change", triggerFilter));
+
+        this.elements.resetFiltersBtn.addEventListener("click", () => this.resetFilters());
+        document.getElementById("clearSearchFromEmpty").addEventListener("click", () => this.resetFilters());
+
+        this.elements.heroSearchAction.addEventListener("click", () => {
+          const q = this.elements.heroCuriosityInput.value.trim();
+          this.state.searchQuery = q;
+          this.applyFilters();
+          document.getElementById("exploreSection").scrollIntoView({ behavior: "smooth" });
+          if (q) this.showToast(`Filtered for: "${q}"`, "info");
+        });
+
+        const toggleTypical = document.getElementById("toggleTypical");
+        const toggleLocal = document.getElementById("toggleLocal");
+
+        toggleTypical.addEventListener("click", () => {
+          toggleTypical.classList.add("active");
+          toggleLocal.classList.remove("active");
+          this.renderTripScenario(false);
+        });
+
+        toggleLocal.addEventListener("click", () => {
+          toggleLocal.classList.add("active");
+          toggleTypical.classList.remove("active");
+          this.renderTripScenario(true);
+        });
+
+        const mobileToggle = document.getElementById("mobileMenuToggle");
+        const mobileDrawer = document.getElementById("mobileDrawer");
+        const drawerOverlay = document.getElementById("mobileDrawerOverlay");
+        const closeDrawer = document.getElementById("closeDrawerBtn");
+
+        const toggleDrawer = (open) => {
+          mobileDrawer.classList.toggle("active", open);
+          drawerOverlay.classList.toggle("active", open);
+          document.body.style.overflow = open ? "hidden" : "";
+        };
+
+        mobileToggle.addEventListener("click", () => toggleDrawer(true));
+        closeDrawer.addEventListener("click", () => toggleDrawer(false));
+        drawerOverlay.addEventListener("click", () => toggleDrawer(false));
+
+        document.querySelectorAll(".mobile-nav-link").forEach(link => {
+          link.addEventListener("click", () => toggleDrawer(false));
+        });
+
+        document.querySelectorAll(".modal-backdrop").forEach(modal => {
+          modal.addEventListener("click", (e) => {
+            if (e.target === modal) this.closeAllModals();
+          });
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") this.closeAllModals();
+        });
+
+        document.getElementById("openSearchBtn").addEventListener("click", () => this.openSearchModal());
+        document.getElementById("closeSearchModal").addEventListener("click", () => this.closeAllModals());
+        document.getElementById("openFavoritesBtn").addEventListener("click", () => this.openFavoritesModal());
+        document.getElementById("closeFavoritesModal").addEventListener("click", () => this.closeAllModals());
+        document.getElementById("openAuthBtn").addEventListener("click", () => this.openAuthModal());
+        document.getElementById("authCtaDrawer").addEventListener("click", () => {
+          toggleDrawer(false);
+          this.openAuthModal();
+        });
+        document.getElementById("closeAuthModal").addEventListener("click", () => this.closeAllModals());
+
+        const hostAction = () => {
+          toggleDrawer(false);
+          this.openHostModal();
+        };
+        document.getElementById("hostCtaNav").addEventListener("click", hostAction);
+        document.getElementById("hostCtaDrawer").addEventListener("click", hostAction);
+        document.getElementById("openHostOnboardBtn").addEventListener("click", hostAction);
+        document.getElementById("footerBecomeHostLink").addEventListener("click", (e) => {
+          e.preventDefault();
+          hostAction();
+        });
+        document.getElementById("closeHostModal").addEventListener("click", () => this.closeAllModals());
+
+        document.getElementById("guestMinusBtn").addEventListener("click", () => this.updateGuestCount(-1));
+        document.getElementById("guestPlusBtn").addEventListener("click", () => this.updateGuestCount(1));
+        document.getElementById("closeBookingModal").addEventListener("click", () => this.closeAllModals());
+        document.getElementById("bookingForm").addEventListener("submit", (e) => this.handleBookingSubmit(e));
+        document.getElementById("closeSuccessBookingBtn").addEventListener("click", () => this.closeAllModals());
+
+        document.getElementById("hostApplicationForm").addEventListener("submit", (e) => this.handleHostSubmit(e));
+        document.getElementById("closeHostSuccessBtn").addEventListener("click", () => this.closeAllModals());
+
+        document.getElementById("launchQuizBtn").addEventListener("click", () => this.startDiscoveryQuiz());
+        document.getElementById("closeQuizModal").addEventListener("click", () => this.closeAllModals());
+
+        document.getElementById("nextTestimonialBtn").addEventListener("click", () => this.shiftTestimonial(1));
+        document.getElementById("prevTestimonialBtn").addEventListener("click", () => this.shiftTestimonial(-1));
+        document.getElementById("newsletterForm").addEventListener("submit", (e) => this.handleNewsletter(e));
+
+        document.getElementById("closeAnnouncement").addEventListener("click", () => {
+          document.querySelector(".announcement-bar").style.display = "none";
+        });
+
+        const globalSearchInput = document.getElementById("globalSearchInput");
+        globalSearchInput.addEventListener("input", (e) => this.handleGlobalSearchInput(e.target.value));
+
+        document.querySelectorAll(".search-shortcut-pill").forEach(pill => {
+          pill.addEventListener("click", () => {
+            globalSearchInput.value = pill.dataset.query;
+            this.handleGlobalSearchInput(pill.dataset.query);
+          });
+        });
+
+        document.getElementById("foodCategoryFilter").addEventListener("click", (e) => {
+          const btn = e.target.closest(".food-tab-btn");
+          if (!btn) return;
+          document.querySelectorAll(".food-tab-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          this.renderFoodShowcase(btn.dataset.foodTag);
+        });
+
+        document.getElementById("eventTimeFilter").addEventListener("click", (e) => {
+          const btn = e.target.closest(".time-filter-btn");
+          if (!btn) return;
+          document.querySelectorAll(".time-filter-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          this.renderEvents(btn.dataset.time);
+        });
+
+        document.querySelectorAll(".map-tag-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".map-tag-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            this.filterMapMarkers(btn.dataset.mapCat);
+          });
+        });
+      }
+
+      renderAll() {
+        this.renderCityDropdown();
+        this.renderCityText();
+        this.applyFilters();
+        this.renderPreferences();
+        this.renderHosts();
+        this.renderFoodShowcase("all");
+        this.renderCultureExperiences();
+        this.renderEvents("all");
+        this.renderTripScenario(false);
+        this.updateFavBadge();
+        this.updateMapForCity();
+      }
+
+      renderCityDropdown() {
+        this.elements.cityDropdownMenu.innerHTML = CITIES_DATA.map(c => `
+          <button type="button" class="city-item-btn ${c.name === this.state.selectedCity ? 'active' : ''}" onclick="app.selectCity('${c.name}')">
+            <span>${c.name}</span>
+            <small class="text-muted">${c.state}</small>
+          </button>
+        `).join("");
+      }
+
+      selectCity(cityName) {
+        this.state.selectedCity = cityName;
+        localStorage.setItem("locora_city", cityName);
+        this.renderCityDropdown();
+        this.renderCityText();
+        this.applyFilters();
+        this.updateMapForCity();
+        this.showToast(`Location set to: ${cityName}`, "info");
+        this.elements.cityDropdownMenu.classList.remove("show");
+      }
+
+      renderCityText() {
+        this.elements.currentCityDisplay.textContent = this.state.selectedCity;
+        this.elements.heroLocationInput.value = this.state.selectedCity;
+        const cityObj = CITIES_DATA.find(c => c.name === this.state.selectedCity);
+        if (cityObj) {
+          this.elements.heroHeadline.innerHTML = `Discover <span class="highlight-serif">${cityObj.name}</span> beyond the usual.`;
+          this.elements.mapCurrentCityBadge.innerHTML = `<i data-lucide="compass"></i> Centered on ${cityObj.name}`;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+
+      applyFilters() {
+        let list = EXPERIENCES_DATA.filter(exp => exp.city === this.state.selectedCity);
+
+        if (this.state.activeMood !== "all") {
+          list = list.filter(exp => exp.category === this.state.activeMood || exp.tags.includes(this.state.activeMood));
+        }
+
+        if (this.state.filterCategory !== "all") {
+          list = list.filter(exp => exp.category === this.state.filterCategory);
+        }
+
+        if (this.state.filterPrice !== "all") {
+          const maxPrice = parseInt(this.state.filterPrice, 10);
+          list = list.filter(exp => exp.price <= maxPrice);
+        }
+
+        if (this.state.filterDuration !== "all") {
+          list = list.filter(exp => exp.duration === this.state.filterDuration);
+        }
+
+        if (this.state.filterRating !== "all") {
+          const minRating = parseFloat(this.state.filterRating);
+          list = list.filter(exp => exp.rating >= minRating);
+        }
+
+        if (this.state.searchQuery) {
+          const q = this.state.searchQuery.toLowerCase();
+          list = list.filter(exp =>
+            exp.title.toLowerCase().includes(q) ||
+            exp.description.toLowerCase().includes(q) ||
+            exp.category.toLowerCase().includes(q) ||
+            exp.host.name.toLowerCase().includes(q)
+          );
+        }
+
+        if (this.state.sortBy === "rating") {
+          list.sort((a, b) => b.rating - a.rating);
+        } else if (this.state.sortBy === "price-low") {
+          list.sort((a, b) => a.price - b.price);
+        } else if (this.state.sortBy === "price-high") {
+          list.sort((a, b) => b.price - a.price);
+        }
+
+        this.renderExperienceGrid(list);
+      }
+
+      renderExperienceGrid(items) {
+        this.elements.resultsCountLabel.textContent = `Showing ${items.length} ${items.length === 1 ? 'experience' : 'experiences'} in ${this.state.selectedCity}`;
+
+        if (items.length === 0) {
+          this.elements.experienceGrid.innerHTML = "";
+          this.elements.experienceEmptyState.classList.remove("hidden");
+          return;
+        }
+
+        this.elements.experienceEmptyState.classList.add("hidden");
+        this.elements.experienceGrid.innerHTML = items.map(item => {
+          const isFav = this.state.favorites.includes(item.id);
+          return `
+            <article class="experience-card" data-id="${item.id}">
+              <div class="card-image-wrap">
+                <img src="${item.image}" alt="${item.title}" loading="lazy">
+                <span class="card-category-pill">${item.category}</span>
+                <button type="button" class="card-fav-btn ${isFav ? 'active' : ''}" onclick="app.toggleFavorite('${item.id}', event)" aria-label="Save discovery">
+                  <i data-lucide="heart"></i>
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="card-meta-top">
+                  <span class="card-location"><i data-lucide="map-pin"></i> ${item.city} • ${item.durationLabel}</span>
+                  <span class="card-rating"><i data-lucide="star"></i> ${item.rating} (${item.reviewsCount})</span>
+                </div>
+                <h3 class="card-title">${item.title}</h3>
+                <div class="card-host-row">
+                  <img src="${item.host.avatar}" alt="${item.host.name}" class="host-avatar-micro">
+                  <span>Hosted by <strong>${item.host.name}</strong></span>
+                </div>
+                <div class="card-footer-pricing">
+                  <div class="card-price-block">
+                    <span class="card-price-num">₹${item.price}</span>
+                    <span class="card-price-unit">per curious traveler</span>
+                  </div>
+                  <button type="button" class="btn btn-outline" onclick="app.openExperienceModal('${item.id}')">View Details</button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join("");
+
+        if (window.lucide) lucide.createIcons();
+      }
+
+      resetFilters() {
+        this.state.activeMood = "all";
+        this.state.searchQuery = "";
+        this.state.filterCategory = "all";
+        this.state.filterPrice = "all";
+        this.state.filterDuration = "all";
+        this.state.filterRating = "all";
+        this.state.sortBy = "recommended";
+
+        this.elements.heroCuriosityInput.value = "";
+        this.elements.filterCategorySelect.value = "all";
+        this.elements.filterPriceSelect.value = "all";
+        this.elements.filterDurationSelect.value = "all";
+        this.elements.filterRatingSelect.value = "all";
+        this.elements.sortSelect.value = "recommended";
+
+        this.elements.moodChipsTrack.querySelectorAll(".mood-chip").forEach(c => c.classList.remove("active"));
+        this.elements.moodChipsTrack.querySelector("[data-mood='all']").classList.add("active");
+
+        this.applyFilters();
+        this.showToast("All filters restored", "info");
+      }
+
+      renderPreferences() {
+        const allTags = this.elements.preferenceTagsContainer.querySelectorAll(".pref-tag");
+        allTags.forEach(tag => {
+          const val = tag.dataset.pref;
+          if (this.state.userPreferences.includes(val)) {
+            tag.classList.add("selected");
+          } else {
+            tag.classList.remove("selected");
+          }
+
+          tag.onclick = () => {
+            if (this.state.userPreferences.includes(val)) {
+              this.state.userPreferences = this.state.userPreferences.filter(p => p !== val);
+            } else {
+              this.state.userPreferences.push(val);
+            }
+            localStorage.setItem("locora_preferences", JSON.stringify(this.state.userPreferences));
+            this.renderPreferences();
+          };
+        });
+
+        const count = this.state.userPreferences.length;
+        if (count === 0) {
+          this.elements.profileStatusText.textContent = "Select at least 2 interests to unlock tailored recommendations.";
+          this.elements.curiosityMatchesTitle.textContent = "Recommended Discoveries";
+          this.renderPersonalizedMatches(EXPERIENCES_DATA.slice(0, 3));
+        } else {
+          this.elements.profileStatusText.textContent = `Vibe tailored to ${count} core interest${count > 1 ? 's' : ''}: ${this.state.userPreferences.join(", ")}`;
+          this.elements.curiosityMatchesTitle.textContent = `Matches for: ${this.state.userPreferences.join(" + ")}`;
+
+          const matches = EXPERIENCES_DATA.filter(exp =>
+            exp.tags.some(t => this.state.userPreferences.includes(t)) ||
+            this.state.userPreferences.includes(exp.category)
+          );
+          this.renderPersonalizedMatches(matches.length > 0 ? matches : EXPERIENCES_DATA.slice(0, 3));
+        }
+      }
+
+      renderPersonalizedMatches(items) {
+        this.elements.personalizedList.innerHTML = items.slice(0, 3).map(item => `
+          <div class="rec-card-mini" onclick="app.openExperienceModal('${item.id}')" style="cursor:pointer;">
+            <img src="${item.image}" alt="${item.title}" loading="lazy">
+            <div class="rec-mini-content">
+              <span class="rec-match-badge">98% Affinity Match • ${item.city}</span>
+              <h4>${item.title}</h4>
+              <span class="text-muted" style="font-size:0.85rem;"><i data-lucide="star" style="width:12px;height:12px;fill:#E5A832;color:#E5A832;display:inline;"></i> ${item.rating} • Hosted by ${item.host.name}</span>
+            </div>
+          </div>
+        `).join("");
+
+        if (window.lucide) lucide.createIcons();
+      }
+
+      initLeafletMap() {
+        const mapElement = document.getElementById("interactiveMap");
+        if (!mapElement || typeof L === "undefined") {
+          document.getElementById("mapFallback").classList.remove("hidden");
+          return;
+        }
+
+        try {
+          this.state.mapInstance = L.map("interactiveMap", {
+            scrollWheelZoom: false
+          }).setView([18.9220, 72.8347], 13);
+
+          L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+            maxZoom: 18
+          }).addTo(this.state.mapInstance);
+
+          this.updateMapForCity();
+        } catch (err) {
+          console.warn("Leaflet Map init error:", err);
+          document.getElementById("mapFallback").classList.remove("hidden");
+        }
+      }
+
+      updateMapForCity() {
+        const cityObj = CITIES_DATA.find(c => c.name === this.state.selectedCity);
+        if (!cityObj || !this.state.mapInstance) return;
+
+        this.state.mapInstance.setView([cityObj.lat, cityObj.lng], 13);
+
+        this.state.mapMarkers.forEach(m => this.state.mapInstance.removeLayer(m));
+        this.state.mapMarkers = [];
+
+        const cityExperiences = EXPERIENCES_DATA.filter(exp => exp.city === this.state.selectedCity);
+        const placesList = this.elements.mapPlacesList;
+        placesList.innerHTML = "";
+
+        cityExperiences.forEach((exp, idx) => {
+          const marker = L.marker([exp.lat, exp.lng]).addTo(this.state.mapInstance);
+          marker.bindPopup(`
+            <div style="font-family:inherit;padding:4px;">
+              <strong style="display:block;font-size:0.95rem;margin-bottom:4px;">${exp.title}</strong>
+              <span style="font-size:0.8rem;color:#C85A32;font-weight:700;">₹${exp.price} • ${exp.rating} ★</span>
+            </div>
+          `);
+          this.state.mapMarkers.push(marker);
+
+          const placeItem = document.createElement("div");
+          placeItem.className = `map-place-item ${idx === 0 ? 'active' : ''}`;
+          placeItem.innerHTML = `
+            <h5>${exp.title}</h5>
+            <p>${exp.durationLabel} • Hosted by ${exp.host.name}</p>
+          `;
+          placeItem.onclick = () => {
+            document.querySelectorAll(".map-place-item").forEach(p => p.classList.remove("active"));
+            placeItem.classList.add("active");
+            this.state.mapInstance.setView([exp.lat, exp.lng], 15);
+            marker.openPopup();
+          };
+          placesList.appendChild(placeItem);
+        });
+      }
+
+      filterMapMarkers(category) {
+        const cityExperiences = EXPERIENCES_DATA.filter(exp => exp.city === this.state.selectedCity);
+        const filtered = category === "all" ? cityExperiences : cityExperiences.filter(e => e.category === category);
+
+        this.state.mapMarkers.forEach(m => this.state.mapInstance.removeLayer(m));
+        this.state.mapMarkers = [];
+
+        filtered.forEach(exp => {
+          const marker = L.marker([exp.lat, exp.lng]).addTo(this.state.mapInstance);
+          marker.bindPopup(`<strong>${exp.title}</strong><br>₹${exp.price}`);
+          this.state.mapMarkers.push(marker);
+        });
+      }
+
+      renderHosts() {
+        this.elements.hostsGrid.innerHTML = HOSTS_DATA.map(h => `
+          <div class="host-card">
+            <div class="host-avatar-wrap">
+              <img src="${h.avatar}" alt="${h.name}" loading="lazy">
+            </div>
+            <h4>${h.name}</h4>
+            <span class="host-role-tag">${h.role} • ${h.city}</span>
+            <p class="host-bio-snippet">${h.bio}</p>
+            <div class="host-stats-pill">
+              <span>★ ${h.rating}</span>
+              <span>${h.expCount} Immersions</span>
+            </div>
+            <button type="button" class="btn btn-outline btn-block" onclick="app.openHostBio('${h.name}')">Meet ${h.name.split(" ")[0]}</button>
+          </div>
+        `).join("");
+      }
+
+      renderFoodShowcase(category) {
+        let items = EXPERIENCES_DATA.filter(e => e.category === "food");
+        if (category !== "all") {
+          items = items.filter(e => e.tags.includes(category));
+        }
+
+        this.elements.foodShowcaseGrid.innerHTML = items.slice(0, 3).map(item => `
+          <div class="experience-card">
+            <div class="card-image-wrap">
+              <img src="${item.image}" alt="${item.title}" loading="lazy">
+              <span class="card-category-pill">CULINARY</span>
+            </div>
+            <div class="card-body">
+              <span class="text-muted" style="font-size:0.8rem;"><i data-lucide="map-pin" style="width:12px;height:12px;display:inline;"></i> ${item.city}</span>
+              <h3 class="card-title" style="margin-top:6px;">${item.title}</h3>
+              <div class="card-footer-pricing">
+                <span class="card-price-num">₹${item.price}</span>
+                <button type="button" class="btn btn-outline" onclick="app.openExperienceModal('${item.id}')">Reserve Spot</button>
+              </div>
+            </div>
+          </div>
+        `).join("");
+
+        if (window.lucide) lucide.createIcons();
+      }
+
+      renderCultureExperiences() {
+        const items = EXPERIENCES_DATA.filter(e => e.category === "craft" || e.category === "culture" || e.category === "art");
+        this.elements.cultureGrid.innerHTML = items.slice(0, 3).map(item => `
+          <div class="experience-card">
+            <div class="card-image-wrap">
+              <img src="${item.image}" alt="${item.title}" loading="lazy">
+              <span class="card-category-pill">${item.category}</span>
+            </div>
+            <div class="card-body">
+              <span class="text-muted" style="font-size:0.8rem;"><i data-lucide="map-pin" style="width:12px;height:12px;display:inline;"></i> ${item.city}</span>
+              <h3 class="card-title" style="margin-top:6px;">${item.title}</h3>
+              <div class="card-footer-pricing">
+                <span class="card-price-num">₹${item.price}</span>
+                <button type="button" class="btn btn-outline" onclick="app.openExperienceModal('${item.id}')">Explore</button>
+              </div>
+            </div>
+          </div>
+        `).join("");
+
+        if (window.lucide) lucide.createIcons();
+      }
+
+      renderEvents(time) {
+        let items = EVENTS_DATA;
+        if (time !== "all") {
+          items = items.filter(e => e.timeTag === time);
+        }
+
+        this.elements.eventsGrid.innerHTML = items.map(evt => `
+          <div class="event-card">
+            <div class="event-date-row">
+              <span class="event-date-pill">${evt.date}</span>
+              <span class="text-muted" style="font-size:0.8rem;">${evt.attendees} Attending</span>
+            </div>
+            <h4>${evt.title}</h4>
+            <div class="event-meta">
+              <span><i data-lucide="map-pin" style="width:14px;height:14px;display:inline;"></i> ${evt.city} • ${evt.location}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:14px;border-top:1px solid var(--color-border-light);">
+              <strong>${evt.price}</strong>
+              <button type="button" class="btn btn-outline" onclick="app.showToast('RSVP added to your calendar!', 'success')">RSVP Spot</button>
+            </div>
+          </div>
+        `).join("");
+
+        if (window.lucide) lucide.createIcons();
+      }
+
+      renderTripScenario(isLocal) {
+        if (isLocal) {
+          this.elements.tripScenarioContent.innerHTML = `
+            <div style="display:flex;gap:16px;align-items:flex-start;">
+              <div style="font-size:2rem;">🌿</div>
+              <div>
+                <h4 style="font-size:1.15rem;margin-bottom:6px;color:var(--color-primary);">LOCORA Immersion Scenario: 3:00 PM to 7:00 PM</h4>
+                <p style="font-size:0.92rem;color:var(--color-text-muted);line-height:1.6;">
+                  Meet Meera Kumbhar at her family clay studio in Kasba Peth. You mold terracotta planters on a century-old wheel while sipping cardamom chai brewed with rain-harvested water. At dusk, stroll down back alleys for freshly made puran poli at a family hearth.
+                </p>
+              </div>
+            </div>
+          `;
+        } else {
+          this.elements.tripScenarioContent.innerHTML = `
+            <div style="display:flex;gap:16px;align-items:flex-start;">
+              <div style="font-size:2rem;">🚌</div>
+              <div>
+                <h4 style="font-size:1.15rem;margin-bottom:6px;color:#BA3C2A;">Typical Checklist Scenario: 3:00 PM to 7:00 PM</h4>
+                <p style="font-size:0.92rem;color:var(--color-text-muted);line-height:1.6;">
+                  Sit in congested traffic aboard an air-conditioned coach. Wait 45 minutes in a ticket queue at a crowded monument. Stop at an affiliated emporium with high-pressure sales for factory-made brass trinkets, followed by a generic buffet dinner.
+                </p>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      toggleFavorite(id, event) {
+        if (event) event.stopPropagation();
+        const idx = this.state.favorites.indexOf(id);
+
+        if (idx > -1) {
+          this.state.favorites.splice(idx, 1);
+          this.showToast("Removed from your saved discoveries", "info");
+        } else {
+          this.state.favorites.push(id);
+          this.showToast("Saved to your discoveries!", "success");
+        }
+
+        localStorage.setItem("locora_favorites", JSON.stringify(this.state.favorites));
+        this.updateFavBadge();
+
+        document.querySelectorAll(`.experience-card[data-id="${id}"] .card-fav-btn`).forEach(btn => {
+          btn.classList.toggle("active", idx === -1);
+        });
+      }
+
+      updateFavBadge() {
+        this.elements.favCountBadge.textContent = this.state.favorites.length;
+        document.getElementById("favSubCount").textContent = `${this.state.favorites.length} saved`;
+      }
+
+      openFavoritesModal() {
+        const listContainer = document.getElementById("favoritesList");
+        if (this.state.favorites.length === 0) {
+          listContainer.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon-wrap"><i data-lucide="heart"></i></div>
+              <h3>Your discovery list is empty</h3>
+              <p>Tap the heart on any experience card to bookmark activities for your upcoming journey.</p>
+            </div>
+          `;
+        } else {
+          const items = EXPERIENCES_DATA.filter(e => this.state.favorites.includes(e.id));
+          listContainer.innerHTML = items.map(item => `
+            <div style="display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--color-border-light);align-items:center;">
+              <img src="${item.image}" alt="${item.title}" style="width:70px;height:70px;object-fit:cover;border-radius:var(--radius-sm);">
+              <div style="flex:1;">
+                <h5 style="font-size:0.95rem;margin-bottom:2px;">${item.title}</h5>
+                <span style="font-size:0.82rem;color:var(--color-secondary);font-weight:700;">₹${item.price} • ${item.city}</span>
+              </div>
+              <button type="button" class="btn btn-outline" style="padding:6px 12px;font-size:0.8rem;" onclick="app.openBookingModal('${item.id}')">Book</button>
+            </div>
+          `).join("");
+        }
+
+        if (window.lucide) lucide.createIcons();
+        this.openModal("favoritesModal");
+      }
+
+      openExperienceModal(id) {
+        const exp = EXPERIENCES_DATA.find(e => e.id === id);
+        if (!exp) return;
+
+        const modalContent = document.getElementById("expModalContent");
+        modalContent.innerHTML = `
+          <div class="exp-hero-gallery">
+            <img src="${exp.gallery[0] || exp.image}" alt="${exp.title}">
+            <img src="${exp.gallery[1] || exp.image}" alt="${exp.title}">
+          </div>
+          <div class="exp-modal-inner">
+            <div class="exp-header-row">
+              <div>
+                <span class="eyebrow">${exp.category.toUpperCase()} • ${exp.city}</span>
+                <h2 style="font-size:2rem;margin-bottom:8px;">${exp.title}</h2>
+                <p class="text-muted"><i data-lucide="star" style="width:14px;height:14px;fill:#E5A832;color:#E5A832;display:inline;"></i> ${exp.rating} (${exp.reviewsCount} verified traveler reviews) • ${exp.durationLabel}</p>
+              </div>
+            </div>
+
+            <div class="exp-main-col">
+              <div>
+                <div class="exp-detail-block">
+                  <h4>About this Immersion</h4>
+                  <p style="color:var(--color-text-muted);line-height:1.7;">${exp.description}</p>
+                </div>
+
+                <div class="exp-detail-block">
+                  <h4>What is Included</h4>
+                  <ul class="exp-included-list">
+                    ${exp.included.map(inc => `<li><i data-lucide="check" style="color:var(--color-success);width:16px;height:16px;"></i> ${inc}</li>`).join("")}
+                  </ul>
+                </div>
+
+                <div class="exp-detail-block" style="background:var(--color-surface-sand);padding:24px;border-radius:var(--radius-md);">
+                  <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
+                    <img src="${exp.host.avatar}" alt="${exp.host.name}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">
+                    <div>
+                      <h4 style="margin:0;">Hosted by ${exp.host.name}</h4>
+                      <span class="text-muted" style="font-size:0.85rem;">${exp.host.role}</span>
+                    </div>
+                  </div>
+                  <p style="font-size:0.9rem;color:var(--color-text-muted);line-height:1.6;">${exp.host.story}</p>
+                </div>
+              </div>
+
+              <div class="exp-booking-sticky-card">
+                <span style="font-size:0.8rem;text-transform:uppercase;font-weight:700;color:var(--color-text-muted);">PRICE PER PERSON</span>
+                <div style="font-size:2rem;font-weight:700;color:var(--color-primary);margin-bottom:16px;">₹${exp.price}</div>
+                <button type="button" class="btn btn-primary btn-block btn-lg" onclick="app.openBookingModal('${exp.id}')">Reserve Experience</button>
+                <p style="font-size:0.75rem;color:var(--color-text-muted);text-align:center;margin-top:12px;">No pre-payment penalty. Direct community payout.</p>
+              </div>
+            </div>
+          </div>
+        `;
+
+        if (window.lucide) lucide.createIcons();
+        this.openModal("experienceModal");
+      }
+
+      openBookingModal(id) {
+        this.closeAllModals();
+        const exp = EXPERIENCES_DATA.find(e => e.id === id);
+        if (!exp) return;
+
+        this.state.activeBookingExp = exp;
+        this.state.bookingGuests = 1;
+
+        document.getElementById("bookingTargetPill").innerHTML = `
+          <span>${exp.title}</span><br>
+          <small class="text-muted">${exp.city} • Hosted by ${exp.host.name}</small>
+        `;
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById("bookDate").value = tomorrow.toISOString().split("T")[0];
+        document.getElementById("bookDate").min = new Date().toISOString().split("T")[0];
+
+        document.getElementById("bookingForm").classList.remove("hidden");
+        document.getElementById("bookingSuccessView").classList.add("hidden");
+
+        this.calculateBookingTotal();
+        this.openModal("bookingModal");
+      }
+
+      updateGuestCount(delta) {
+        let next = this.state.bookingGuests + delta;
+        if (next < 1) next = 1;
+        if (next > 8) next = 8;
+        this.state.bookingGuests = next;
+        document.getElementById("bookGuests").value = next;
+        this.calculateBookingTotal();
+      }
+
+      calculateBookingTotal() {
+        if (!this.state.activeBookingExp) return;
+        const base = this.state.activeBookingExp.price * this.state.bookingGuests;
+        const communityFund = Math.round(base * 0.05);
+        const serviceFee = 40;
+        const total = base + communityFund + serviceFee;
+
+        document.getElementById("pricePerPersonLabel").textContent = `₹${this.state.activeBookingExp.price} × ${this.state.bookingGuests} ${this.state.bookingGuests > 1 ? 'Guests' : 'Guest'}`;
+        document.getElementById("priceSubtotal").textContent = `₹${base}`;
+        document.getElementById("priceCommunityFund").textContent = `₹${communityFund}`;
+        document.getElementById("priceServiceFee").textContent = `₹${serviceFee}`;
+        document.getElementById("priceFinalTotal").textContent = `₹${total}`;
+      }
+
+      handleBookingSubmit(e) {
+        e.preventDefault();
+        const dateVal = document.getElementById("bookDate").value;
+        const timeVal = document.getElementById("bookTime").value;
+
+        if (!dateVal) {
+          this.showToast("Please choose a date for your immersion", "warning");
+          return;
+        }
+
+        document.getElementById("bookingForm").classList.add("hidden");
+        const successView = document.getElementById("bookingSuccessView");
+        successView.classList.remove("hidden");
+
+        const refNumber = "LOC-" + Math.floor(100000 + Math.random() * 900000);
+        document.getElementById("bookingReceiptDetails").innerHTML = `
+          <div><strong>Booking Ref:</strong> ${refNumber}</div>
+          <div><strong>Experience:</strong> ${this.state.activeBookingExp.title}</div>
+          <div><strong>Date & Time:</strong> ${dateVal} at ${timeVal}</div>
+          <div><strong>Guests:</strong> ${this.state.bookingGuests} Adult(s)</div>
+          <div><strong>Meeting Point:</strong> Dispatched to ${this.state.currentUser.email}</div>
+        `;
+
+        this.state.currentUser.trips = (this.state.currentUser.trips || 0) + 1;
+        localStorage.setItem("locora_user", JSON.stringify(this.state.currentUser));
+        this.showToast("Immersion Confirmed! Pack your curiosity.", "success");
+      }
+
+      openAuthModal() {
+        const isLogged = !!this.state.currentUser;
+        const formContainer = document.getElementById("authFormsContainer");
+        const profileContainer = document.getElementById("userProfileContainer");
+
+        if (isLogged) {
+          formContainer.classList.add("hidden");
+          profileContainer.classList.remove("hidden");
+          document.getElementById("profileNameDisplay").textContent = this.state.currentUser.name;
+          document.getElementById("userTripsCount").textContent = this.state.currentUser.trips || 1;
+          document.getElementById("userSavesCount").textContent = this.state.favorites.length;
+        } else {
+          formContainer.classList.remove("hidden");
+          profileContainer.classList.add("hidden");
+        }
+
+        const tabLogin = document.getElementById("tabLogin");
+        const tabRegister = document.getElementById("tabRegister");
+        const loginForm = document.getElementById("loginForm");
+        const registerForm = document.getElementById("registerForm");
+
+        tabLogin.onclick = () => {
+          tabLogin.classList.add("active");
+          tabRegister.classList.remove("active");
+          loginForm.classList.remove("hidden");
+          registerForm.classList.add("hidden");
+        };
+
+        tabRegister.onclick = () => {
+          tabRegister.classList.add("active");
+          tabLogin.classList.remove("active");
+          registerForm.classList.remove("hidden");
+          loginForm.classList.add("hidden");
+        };
+
+        loginForm.onsubmit = (e) => {
+          e.preventDefault();
+          const email = document.getElementById("loginEmail").value;
+          if (!email) return;
+          this.state.currentUser = { name: "Alex Morgan", email, trips: 1 };
+          localStorage.setItem("locora_user", JSON.stringify(this.state.currentUser));
+          this.showToast("Signed in as Alex Morgan", "success");
+          this.openAuthModal();
+        };
+
+        registerForm.onsubmit = (e) => {
+          e.preventDefault();
+          const name = document.getElementById("regName").value;
+          const email = document.getElementById("regEmail").value;
+          if (!name || !email) return;
+          this.state.currentUser = { name, email, trips: 0 };
+          localStorage.setItem("locora_user", JSON.stringify(this.state.currentUser));
+          this.showToast(`Welcome to the community, ${name}!`, "success");
+          this.openAuthModal();
+        };
+
+        document.getElementById("logoutBtn").onclick = () => {
+          this.state.currentUser = null;
+          localStorage.removeItem("locora_user");
+          this.showToast("Signed out", "info");
+          this.openAuthModal();
+        };
+
+        this.openModal("authModal");
+      }
+
+      openHostModal() {
+        document.getElementById("hostApplicationForm").classList.remove("hidden");
+        document.getElementById("hostSuccessState").classList.add("hidden");
+        this.openModal("hostModal");
+      }
+
+      handleHostSubmit(e) {
+        e.preventDefault();
+        const name = document.getElementById("hostFullName").value;
+        const title = document.getElementById("hostExperienceTitle").value;
+
+        if (!name || !title) {
+          this.showToast("Please provide your name and experience concept", "warning");
+          return;
+        }
+
+        document.getElementById("hostApplicationForm").classList.add("hidden");
+        document.getElementById("hostSuccessState").classList.remove("hidden");
+        this.showToast("Host proposal received. Welcome to Locora!", "success");
+      }
+
+      openHostBio(hostName) {
+        const host = HOSTS_DATA.find(h => h.name === hostName);
+        if (!host) return;
+
+        document.getElementById("hostBioContent").innerHTML = `
+          <div style="text-align:center;margin-bottom:24px;">
+            <img src="${host.avatar}" alt="${host.name}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 16px;">
+            <h3>${host.name}</h3>
+            <span class="eyebrow">${host.role} • ${host.city}</span>
+          </div>
+          <p style="color:var(--color-text-muted);line-height:1.7;margin-bottom:24px;">${host.bio}</p>
+          <div style="background:var(--color-surface-sand);padding:16px;border-radius:var(--radius-md);margin-bottom:24px;">
+            <strong style="display:block;margin-bottom:6px;">Host Commitment:</strong>
+            <span style="font-size:0.85rem;color:var(--color-text-muted);">100% locally-sourced ingredients, strict carbon-neutral neighborhood walking routes, and direct fair wage retention.</span>
+          </div>
+          <button type="button" class="btn btn-primary btn-block" onclick="app.closeAllModals(); app.elements.heroCuriosityInput.value='${host.city}'; app.elements.heroSearchAction.click();">
+            Explore ${host.name.split(" ")[0]}'s Experiences
+          </button>
+        `;
+
+        this.openModal("hostBioModal");
+      }
+
+      openStoryModal(storyId) {
+        const story = STORIES_DATA[storyId];
+        if (!story) return;
+
+        document.getElementById("storyModalContent").innerHTML = `
+          <img src="${story.image}" alt="${story.title}" style="width:100%;height:320px;object-fit:cover;">
+          <div style="padding:40px;">
+            <span class="eyebrow">EDITORIAL DISPATCH • ${story.city}</span>
+            <h2 style="font-size:2.2rem;margin-bottom:12px;">${story.title}</h2>
+            <span class="text-muted" style="display:block;margin-bottom:24px;">Words by ${story.author}</span>
+            <div style="font-family:var(--font-serif);font-size:1.15rem;line-height:1.8;color:var(--color-text-main);white-space:pre-line;">
+              ${story.content}
+            </div>
+          </div>
+        `;
+
+        this.openModal("storyModal");
+      }
+
+      startDiscoveryQuiz() {
+        const questions = [
+          {
+            q: "What makes your pulse race when stepping into a new city?",
+            options: [
+              { text: "Tasting generational recipes at unmarked food carts", type: "food" },
+              { text: "Getting hands messy at a family terracotta or textile loom", type: "craft" },
+              { text: "Exploring quiet courtyard havelis with a historian", type: "culture" },
+              { text: "Catching acoustic jam sessions in a garden studio", type: "art" }
+            ]
+          }
+        ];
+
+        const currentQ = questions[0];
+        document.getElementById("quizQuestionCard").innerHTML = `
+          <h4 style="font-size:1.25rem;margin-bottom:20px;">${currentQ.q}</h4>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            ${currentQ.options.map(opt => `
+              <button type="button" class="btn btn-outline" style="text-align:left;justify-content:flex-start;padding:14px 20px;" onclick="app.finishQuiz('${opt.type}')">
+                ${opt.text}
+              </button>
+            `).join("")}
+          </div>
+        `;
+
+        document.getElementById("quizQuestionCard").classList.remove("hidden");
+        document.getElementById("quizResultCard").classList.add("hidden");
+        this.openModal("quizModal");
+      }
+
+      finishQuiz(archetype) {
+        document.getElementById("quizQuestionCard").classList.add("hidden");
+        const resCard = document.getElementById("quizResultCard");
+        resCard.classList.remove("hidden");
+
+        let title = "The Culture & Craft Custodian";
+        let desc = "You cherish hands-on memories, generational techniques, and conversation over fast-paced tourist checklists.";
+
+        if (archetype === "food") {
+          title = "The Neighborhood Flavor Alchemist";
+          desc = "To you, geography is understood through cumin seeds, sourdough crusts, and backwater coconut curries.";
+        }
+
+        document.getElementById("archetypeName").textContent = title;
+        document.getElementById("archetypeDesc").textContent = desc;
+
+        document.getElementById("applyQuizFindingsBtn").onclick = () => {
+          this.closeAllModals();
+          this.state.activeMood = archetype;
+          this.applyFilters();
+          document.getElementById("exploreSection").scrollIntoView({ behavior: "smooth" });
+        };
+      }
+
+      shiftTestimonial(direction) {
+        const slides = document.querySelectorAll(".testimonial-slide");
+        let activeIdx = 0;
+        slides.forEach((s, idx) => {
+          if (s.classList.contains("active")) activeIdx = idx;
+        });
+
+        slides[activeIdx].classList.remove("active");
+        let nextIdx = (activeIdx + direction + slides.length) % slides.length;
+        slides[nextIdx].classList.add("active");
+      }
+
+      openSearchModal() {
+        document.getElementById("globalSearchInput").value = "";
+        document.getElementById("searchLiveResults").innerHTML = "";
+        this.openModal("searchModal");
+        setTimeout(() => document.getElementById("globalSearchInput").focus(), 100);
+      }
+
+      handleGlobalSearchInput(val) {
+        const container = document.getElementById("searchLiveResults");
+        if (!val || val.trim().length < 2) {
+          container.innerHTML = "";
+          return;
+        }
+
+        const q = val.toLowerCase();
+        const hits = EXPERIENCES_DATA.filter(e =>
+          e.title.toLowerCase().includes(q) ||
+          e.city.toLowerCase().includes(q) ||
+          e.category.toLowerCase().includes(q)
+        );
+
+        if (hits.length === 0) {
+          container.innerHTML = `<p class="text-muted" style="padding:12px 0;">No experiences matching "${val}"</p>`;
+          return;
+        }
+
+        container.innerHTML = hits.map(hit => `
+          <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:var(--radius-sm);background:var(--color-surface-sand);cursor:pointer;" onclick="app.closeAllModals(); app.openExperienceModal('${hit.id}')">
+            <img src="${hit.image}" alt="${hit.title}" style="width:48px;height:48px;object-fit:cover;border-radius:var(--radius-xs);">
+            <div style="flex:1;">
+              <h5 style="margin:0;font-size:0.9rem;">${hit.title}</h5>
+              <span style="font-size:0.75rem;color:var(--color-secondary);">${hit.city} • ₹${hit.price}</span>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      handleNewsletter(e) {
+        e.preventDefault();
+        const input = document.getElementById("newsletterEmail");
+        const feedback = document.getElementById("newsletterFeedback");
+        const email = input.value.trim();
+
+        if (!email || !email.includes("@") || !email.includes(".")) {
+          feedback.className = "form-message error";
+          feedback.textContent = "Please enter a valid email address.";
+          return;
+        }
+
+        feedback.className = "form-message success";
+        feedback.textContent = "You're in! Look out for local dispatches every other Wednesday.";
+        input.value = "";
+        this.showToast("Newsletter confirmed. Welcome to the inner circle.", "success");
+      }
+
+      openModal(modalId) {
+        document.querySelectorAll(".modal-backdrop").forEach(m => m.classList.remove("open"));
+        const target = document.getElementById(modalId);
+        if (target) {
+          target.classList.add("open");
+          document.body.style.overflow = "hidden";
+        }
+      }
+
+      closeAllModals() {
+        document.querySelectorAll(".modal-backdrop").forEach(m => m.classList.remove("open"));
+        document.body.style.overflow = "";
+      }
+
+      showToast(message, type = "info") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" style="width:18px;height:18px;"></i>
+          <span>${message}</span>
+        `;
+        this.elements.toastContainer.appendChild(toast);
+
+        if (window.lucide) lucide.createIcons();
+
+        setTimeout(() => toast.classList.add("visible"), 20);
+        setTimeout(() => {
+          toast.classList.remove("visible");
+          setTimeout(() => toast.remove(), 400);
+        }, 3600);
+      }
+
+      initScrollListener() {
+        window.addEventListener("scroll", () => {
+          const winScroll = document.documentElement.scrollTop;
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const scrolled = (winScroll / height) * 100;
+          this.elements.scrollProgress.style.width = `${scrolled}%`;
+
+          if (winScroll > 40) {
+            this.elements.header.classList.add("scrolled");
+          } else {
+            this.elements.header.classList.remove("scrolled");
+          }
+        }, { passive: true });
+      }
+
+      initCounters() {
+        const statElements = document.querySelectorAll(".stat-number");
+        const observer = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const target = parseInt(entry.target.dataset.target, 10);
+              let current = 0;
+              const increment = Math.ceil(target / 45);
+              const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                  entry.target.textContent = target.toLocaleString();
+                  clearInterval(timer);
+                } else {
+                  entry.target.textContent = current.toLocaleString();
+                }
+              }, 30);
+              obs.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.2 });
+
+        statElements.forEach(el => observer.observe(el));
+      }
+    }
+
+    let app;
+    document.addEventListener("DOMContentLoaded", () => {
+      app = new LocoraApp();
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+</html>
